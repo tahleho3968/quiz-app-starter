@@ -25,7 +25,11 @@ body {
     );
   background-attachment: fixed;
   color: var(--text-pure);
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   margin: 0;
   padding: 0;
 }
@@ -87,6 +91,7 @@ body {
   box-shadow: 0 0 12px rgba(219, 38, 124, 0.2);
 }
 
+/* 🎴 Main Question Card Layout */
 .card {
   background-color: var(--card-dark);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -109,12 +114,13 @@ body {
 
 .question-card h2 {
   margin-top: 0;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   font-size: 1.45rem;
   line-height: 1.5;
   font-weight: 600;
 }
 
+/* 🎛️ Interaction Options Container & Buttons */
 .options-container {
   display: flex;
   flex-direction: column;
@@ -161,6 +167,7 @@ body {
   cursor: not-allowed;
 }
 
+/* 💬 Explanations & CTA Actions */
 .feedback-box {
   margin-top: 2rem;
   padding-top: 2rem;
@@ -228,6 +235,127 @@ body {
   filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.3));
 }
 
+/* 🎬 Sticker Container & Transparent Backdrop Settings */
+.animal-feedback-wrapper {
+  min-height: 210px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.animal-feedback {
+  text-align: center;
+  font-weight: bold;
+}
+
+.animal-gif.large-sticker {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+
+  /* 🪄 BLENDING LAYER: Removes the white canvas rectangle around Leo the Lion */
+  mix-blend-mode: multiply;
+  opacity: 0.95;
+
+  /* Radiates a gentle neon red shadow around the silhouette edges */
+  filter: drop-shadow(0 0 12px rgba(255, 51, 102, 0.3));
+}
+
+.animal-feedback p {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 10px;
+  color: var(--text-pure);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.3px;
+}
+
+/* 🌟 Graceful 3-Second PowerPoint Transition Animations */
+
+/* 1. Card Fade-In Entry (Reappears smoothly over 3 seconds) */
+.slide-fade-in {
+  animation: slideFade 3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes slideFade {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 2. PowerPoint Disappear Class (Fades out smoothly over 3 seconds) */
+.card-exit {
+  opacity: 0 !important;
+  transform: translateY(-30px) scale(0.96) !important;
+  transition:
+    opacity 3s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* 3. Correct Option Celebration (Mr. Eddy) */
+.success-pop {
+  animation: popCelebrate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes popCelebrate {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* 4. Incorrect Choice Animation (Leo the Lion Shake & Heave) */
+.shake-shake {
+  animation:
+    sadShake 0.4s ease-in-out both,
+    cryHeave 1.4s ease-in-out infinite 0.4s;
+}
+
+@keyframes sadShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-8px);
+  }
+  40%,
+  80% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes cryHeave {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-5px) scale(1.02) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(2px) scale(0.98) rotate(1deg);
+  }
+  75% {
+    transform: translateY(-3px) scale(1.01);
+  }
+}
+
+/* 5. Utility Feedback Micro-interactions */
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -236,5 +364,21 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.text-pop {
+  animation: buttonGlowPop 0.3s ease-in-out;
+}
+
+@keyframes buttonGlowPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
   }
 }
