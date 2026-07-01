@@ -26,9 +26,8 @@ function App() {
     setSelectedAnswer(selectedIndex);
     setIsAnswered(true);
 
-    let newScore = score;
     if (selectedIndex === currentQuestion.correctAnswer) {
-      newScore = score + 1;
+      const newScore = score + 1;
       setScore(newScore);
       localStorage.setItem("quizScore", String(newScore));
     }
@@ -59,13 +58,18 @@ function App() {
       <div className="app">
         <h1>🎉 Quiz Complete!</h1>
         <div className="score-card">
-          <p className="score-number">{score} / {totalQuestions}</p>
+          <p className="score-number">
+            {score} / {totalQuestions}
+          </p>
           <p className="score-percentage">{percentage}%</p>
           <p className="score-message">
-            {percentage >= 80 ? "🌟 Excellent work!" :
-             percentage >= 60 ? "💪 Good job!" :
-             percentage >= 40 ? "📚 Keep learning!" :
-             "🌱 Keep practicing!"}
+            {percentage >= 80
+              ? "🌟 Excellent work!"
+              : percentage >= 60
+                ? "💪 Good job!"
+                : percentage >= 40
+                  ? "📚 Keep learning!"
+                  : "🌱 Keep practicing!"}
           </p>
           <button onClick={handleRestart} className="restart-btn">
             🔄 Start Over
@@ -79,13 +83,17 @@ function App() {
     <div className="app">
       <h1>🧠 Quiz App</h1>
       <div className="header">
-        <p className="progress">Question {currentIndex + 1} of {totalQuestions}</p>
+        <p className="progress">
+          Question {currentIndex + 1} of {totalQuestions}
+        </p>
         <p className="score">Score: {score}</p>
       </div>
 
       <div className="question-container">
         <div className="question">
-          <span className="category">{currentQuestion.category.toUpperCase()}</span>
+          <span className="category">
+            {currentQuestion.category.toUpperCase()}
+          </span>
           <h2>{currentQuestion.question}</h2>
         </div>
 
@@ -94,7 +102,11 @@ function App() {
             let className = "option-btn";
             if (isAnswered && index === currentQuestion.correctAnswer) {
               className += " correct";
-            } else if (isAnswered && index === selectedAnswer && selectedAnswer !== currentQuestion.correctAnswer) {
+            } else if (
+              isAnswered &&
+              index === selectedAnswer &&
+              selectedAnswer !== currentQuestion.correctAnswer
+            ) {
               className += " wrong";
             }
 
@@ -120,11 +132,10 @@ function App() {
         )}
 
         {isAnswered && (
-          <button
-            onClick={handleNext}
-            className="next-btn"
-          >
-            {currentIndex < totalQuestions - 1 ? "Next Question →" : "See Results 🎉"}
+          <button onClick={handleNext} className="next-btn">
+            {currentIndex < totalQuestions - 1
+              ? "Next Question →"
+              : "See Results 🎉"}
           </button>
         )}
       </div>
