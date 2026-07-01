@@ -1,7 +1,9 @@
 import type { Question } from "../types/quiz";
 
 const questions: Question[] = [
-  // GIT CATEGORY
+  // ============================================
+  // GIT CATEGORY (5 Questions)
+  // ============================================
   {
     id: 1,
     question: "What does `git clone` do?",
@@ -73,7 +75,9 @@ const questions: Question[] = [
       "git pull downloads changes from the remote repository and merges them into your current branch.",
   },
 
-  // REACT CATEGORY
+  // ============================================
+  // REACT CATEGORY (5 Questions)
+  // ============================================
   {
     id: 6,
     question: "What does `useState` do in React?",
@@ -145,7 +149,9 @@ const questions: Question[] = [
       "props (short for properties) are data passed from a parent component to a child component.",
   },
 
-  // TYPESCRIPT CATEGORY
+  // ============================================
+  // TYPESCRIPT CATEGORY (5 Questions)
+  // ============================================
   {
     id: 11,
     question: "What is TypeScript?",
@@ -217,7 +223,9 @@ const questions: Question[] = [
       "The boolean type represents true or false values.",
   },
 
-  // TOOLING / DEV TOOLS
+  // ============================================
+  // TOOLING / DEV TOOLS (5 Questions)
+  // ============================================
   {
     id: 16,
     question: "What does `npm install` do?",
@@ -289,7 +297,9 @@ const questions: Question[] = [
       "npm run dev starts the Vite development server at localhost:5173.",
   },
 
-  // DEPLOYMENT
+  // ============================================
+  // DEPLOYMENT (5 Questions)
+  // ============================================
   {
     id: 21,
     question: "What is Vercel?",
@@ -332,10 +342,40 @@ const questions: Question[] = [
     explanation:
       "CI/CD automates building, testing, and deploying your application whenever code changes are pushed.",
   },
-
-  // HTML / CSS
   {
     id: 24,
+    question: "What critical task happens during the production build pipeline (`npm run build`)?",
+    options: [
+      "The source files are directly uploaded to a physical local database",
+      "The source files are bundled, minified, and compiled down into optimized static assets",
+      "The setup turns off TypeScript types checking configurations completely",
+      "The build config sets up an active testing server on the local host line",
+    ],
+    correctAnswer: 1,
+    category: "deployment",
+    explanation:
+      "The production build gathers, bundles, transpiles, and minifies files into lightweight, standalone static assets optimal for fast delivery from a server.",
+  },
+  {
+    id: 25,
+    question: "What does a `404 Not Found` HTTP status code represent?",
+    options: [
+      "The server received an unauthorized administration authentication login request",
+      "The server itself went down completely due to internal processing runtime errors",
+      "The requested URL route or asset pathway could not be located on the hosting platform",
+      "The data transfer pipeline completed the download transaction process normally",
+    ],
+    correctAnswer: 2,
+    category: "deployment",
+    explanation:
+      "An HTTP 404 response explicitly states that the host successfully communicated with the client browser, but the targeted URL path does not exist on that server.",
+  },
+
+  // ============================================
+  // HTML / CSS (5 Questions)
+  // ============================================
+  {
+    id: 26,
     question: "What does `flexbox` do in CSS?",
     options: [
       "Creates a flexbox layout",
@@ -349,7 +389,7 @@ const questions: Question[] = [
       "Flexbox is a CSS layout model that distributes space and aligns items in a container.",
   },
   {
-    id: 25,
+    id: 27,
     question: "What is the purpose of responsive design?",
     options: [
       "To make the app look good on different screen sizes",
@@ -361,6 +401,33 @@ const questions: Question[] = [
     category: "html-css",
     explanation:
       "Responsive design ensures that websites work well on different devices and screen sizes.",
+  },
+  {
+    id: 28,
+    question: "Which HTML5 element is used to display standalone self-contained content like illustrations or photos?",
+    options: ["<aside>", "<section>", "<figure>", "<details>"],
+    correctAnswer: 2,
+    category: "html-css",
+    explanation:
+      "<figure> is a semantic element designed to encapsulate self-contained media content, often paired with <figcaption>.",
+  },
+  {
+    id: 29,
+    question: "What is the default value of the `position` property in CSS?",
+    options: ["relative", "static", "absolute", "fixed"],
+    correctAnswer: 1,
+    category: "html-css",
+    explanation:
+      "Elements are positioned 'static' by default, meaning they follow the normal document flow and are unaffected by top, bottom, left, or right properties.",
+  },
+  {
+    id: 30,
+    question: "In CSS Box Model, which property adds space inside an element between its content and its border?",
+    options: ["margin", "padding", "border-width", "outline"],
+    correctAnswer: 1,
+    category: "html-css",
+    explanation:
+      "Padding adds transparent space inside an element's border, whereas margin adds space outside the border boundaries.",
   },
 ];
 
