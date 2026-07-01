@@ -15,6 +15,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "git",
+    difficulty: "easy",
     explanation:
       "git clone creates a local copy of a remote repository, including its full commit history.",
   },
@@ -29,6 +30,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "git",
+    difficulty: "easy",
     explanation:
       "git add . stages all changes in the current directory and subdirectories, preparing them for commit.",
   },
@@ -43,6 +45,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "git",
+    difficulty: "medium",
     explanation:
       "A Pull Request is used to propose changes, get code review, and merge code into the main branch.",
   },
@@ -57,6 +60,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "git",
+    difficulty: "medium",
     explanation:
       "git checkout branch-name switches to the specified branch. Use git checkout -b to create and switch.",
   },
@@ -71,6 +75,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "git",
+    difficulty: "hard",
     explanation:
       "git pull downloads changes from the remote repository and merges them into your current branch.",
   },
@@ -89,6 +94,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "react",
+    difficulty: "easy",
     explanation:
       "useState is a React Hook that lets you add state to functional components.",
   },
@@ -103,6 +109,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "react",
+    difficulty: "easy",
     explanation:
       "JSX allows you to write HTML-like syntax directly in JavaScript, which React converts to DOM elements.",
   },
@@ -117,6 +124,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 0,
     category: "react",
+    difficulty: "medium",
     explanation:
       "A React component is a function or class that returns JSX to render UI elements.",
   },
@@ -131,6 +139,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "react",
+    difficulty: "medium",
     explanation:
       "useEffect handles side effects such as API calls, timers, or subscriptions that run after render.",
   },
@@ -145,6 +154,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 0,
     category: "react",
+    difficulty: "hard",
     explanation:
       "props (short for properties) are data passed from a parent component to a child component.",
   },
@@ -163,6 +173,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "typescript",
+    difficulty: "easy",
     explanation:
       "TypeScript adds static typing to JavaScript, catching type errors during development.",
   },
@@ -177,22 +188,18 @@ const questions: Question[] = [
     ],
     correctAnswer: 0,
     category: "typescript",
+    difficulty: "easy",
     explanation:
       "Type alias allows you to create a new name for a type, making your code more readable.",
   },
   {
     id: 13,
     question: "What is a `string` type in TypeScript?",
-    options: [
-      "A number",
-      "A boolean",
-      "A textual data type",
-      "An array",
-    ],
+    options: ["A number", "A boolean", "A textual data type", "An array"],
     correctAnswer: 2,
     category: "typescript",
-    explanation:
-      "The string type represents textual data in TypeScript.",
+    difficulty: "medium",
+    explanation: "The string type represents textual data in TypeScript.",
   },
   {
     id: 14,
@@ -205,22 +212,18 @@ const questions: Question[] = [
     ],
     correctAnswer: 0,
     category: "typescript",
+    difficulty: "medium",
     explanation:
       "Interface defines the shape an object should have, specifying property names and types.",
   },
   {
     id: 15,
     question: "What is the `boolean` type in TypeScript?",
-    options: [
-      "A number",
-      "A string",
-      "A true or false value",
-      "An object",
-    ],
+    options: ["A number", "A string", "A true or false value", "An object"],
     correctAnswer: 2,
     category: "typescript",
-    explanation:
-      "The boolean type represents true or false values.",
+    difficulty: "hard",
+    explanation: "The boolean type represents true or false values.",
   },
 
   // ============================================
@@ -237,6 +240,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "tooling",
+    difficulty: "easy",
     explanation:
       "npm install downloads and installs all dependencies listed in package.json.",
   },
@@ -251,6 +255,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "tooling",
+    difficulty: "easy",
     explanation:
       "Vite is a build tool that provides fast development server and optimized builds.",
   },
@@ -265,6 +270,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "tooling",
+    difficulty: "medium",
     explanation:
       "ESLint analyzes code to catch syntax errors and enforce consistent coding rules.",
   },
@@ -279,6 +285,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "tooling",
+    difficulty: "medium",
     explanation:
       "package.json lists dependencies and contains scripts for running, building, and testing the project.",
   },
@@ -293,8 +300,8 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "tooling",
-    explanation:
-      "npm run dev starts the Vite development server at localhost:5173.",
+    difficulty: "hard",
+    explanation: "npm run dev starts the Vite development server at localhost:5173.",
   },
 
   // ============================================
@@ -311,6 +318,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "deployment",
+    difficulty: "easy",
     explanation:
       "Vercel is a platform for deploying and hosting frontend applications with built-in CI/CD.",
   },
@@ -325,6 +333,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "deployment",
+    difficulty: "easy",
     explanation:
       "Vercel automatically redeploys your application whenever you push changes to the main branch.",
   },
@@ -339,12 +348,14 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "deployment",
+    difficulty: "medium",
     explanation:
       "CI/CD automates building, testing, and deploying your application whenever code changes are pushed.",
   },
   {
     id: 24,
-    question: "What critical task happens during the production build pipeline (`npm run build`)?",
+    question:
+      "What critical task happens during the production build pipeline (`npm run build`)?",
     options: [
       "The source files are directly uploaded to a physical local database",
       "The source files are bundled, minified, and compiled down into optimized static assets",
@@ -353,6 +364,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 1,
     category: "deployment",
+    difficulty: "medium",
     explanation:
       "The production build gathers, bundles, transpiles, and minifies files into lightweight, standalone static assets optimal for fast delivery from a server.",
   },
@@ -367,6 +379,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 2,
     category: "deployment",
+    difficulty: "hard",
     explanation:
       "An HTTP 404 response explicitly states that the host successfully communicated with the client browser, but the targeted URL path does not exist on that server.",
   },
@@ -385,6 +398,7 @@ const questions: Question[] = [
     ],
     correctAnswer: 0,
     category: "html-css",
+    difficulty: "easy",
     explanation:
       "Flexbox is a CSS layout model that distributes space and aligns items in a container.",
   },
@@ -399,15 +413,18 @@ const questions: Question[] = [
     ],
     correctAnswer: 0,
     category: "html-css",
+    difficulty: "easy",
     explanation:
       "Responsive design ensures that websites work well on different devices and screen sizes.",
   },
   {
     id: 28,
-    question: "Which HTML5 element is used to display standalone self-contained content like illustrations or photos?",
+    question:
+      "Which HTML5 element is used to display standalone self-contained content like illustrations or photos?",
     options: ["<aside>", "<section>", "<figure>", "<details>"],
     correctAnswer: 2,
     category: "html-css",
+    difficulty: "medium",
     explanation:
       "<figure> is a semantic element designed to encapsulate self-contained media content, often paired with <figcaption>.",
   },
@@ -417,15 +434,18 @@ const questions: Question[] = [
     options: ["relative", "static", "absolute", "fixed"],
     correctAnswer: 1,
     category: "html-css",
+    difficulty: "medium",
     explanation:
       "Elements are positioned 'static' by default, meaning they follow the normal document flow and are unaffected by top, bottom, left, or right properties.",
   },
   {
     id: 30,
-    question: "In CSS Box Model, which property adds space inside an element between its content and its border?",
+    question:
+      "In CSS Box Model, which property adds space inside an element between its content and its border?",
     options: ["margin", "padding", "border-width", "outline"],
     correctAnswer: 1,
     category: "html-css",
+    difficulty: "hard",
     explanation:
       "Padding adds transparent space inside an element's border, whereas margin adds space outside the border boundaries.",
   },
