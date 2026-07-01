@@ -60,18 +60,25 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
+/*Changed progress-tracker styles and added divider*/
 .progress-tracker {
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  background: #1f1235;
+  padding: 8px 14px;
+  border-radius: 14px;
+  color: #e5e7eb;
+  width: fit-content;
+  white-space: nowrap;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.2);
 }
-
+.divider {
+  color: #6b7280;
+}
 .progress-tracker strong {
-  color: var(--electric-blue);
+  color: #a855f7;
 }
 
 .category-tag {
@@ -251,12 +258,28 @@ body {
 .progress-bar-bg {
   width: 100%;
   height: 10px;
-  background: #e0e0e0;
-  border-radius: 10px;
+  background: #2a1b3d;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
 }
 .progress-bar-fill {
   height: 100%;
-  background: #2d6a4f;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #a855f7, #7c3aed);
+  border-radius: 12px;
+  transition: width 0.6s ease-in-out;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  /*For more Effect*/
+  animation: progressGlow 1s infinite ease-in-out;
+}
+@keyframes progressGlow {
+  0% {
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+  }
 }

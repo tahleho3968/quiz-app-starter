@@ -98,11 +98,13 @@ function App() {
         <h1>ACA Orientation Quiz</h1>
         <div className="progress-tracker">
           Question <strong>{currentNumber}</strong> of {totalQuestions}
-          {" | "} Score: <strong>{score}</strong> {" | "}
+          <span className="divider">|</span>
+          Score: <strong>{score}</strong>
+          <span className="divider">|</span>
           {percentage}%
         </div>
       </header>
-      /*===== Progress Bar ======*/
+      {/*===== Progress Bar ======*/}
       <div className="progress-bar-container">
         <div className="progress-bar-bg">
           <div
