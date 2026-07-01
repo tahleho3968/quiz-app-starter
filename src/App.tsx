@@ -1,26 +1,127 @@
+import { useState, useEffect } from "react";
 import questions from "./data/questions";
+import { QuestionCard } from "./components/QuestionCard";
+import { ResultCard } from "./components/ResultCard";
 import "./App.css";
 
 function App() {
+  // --- STATE WITH LOCALSTORAGE PERSISTENCE INITIALIZERS ---
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(
+    () => {
+      const saved = localStorage.getItem("quiz_current_index");
+      return saved ? parseInt(saved, 10) : 0;
+    },
+  );
+
+  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(
+    () => {
+      const saved = localStorage.getItem("quiz_selected_answer");
+      return saved ? parseInt(saved, 10) : null;
+    },
+  );
+
+  const [score, setScore] = useState<number>(() => {
+    const saved = localStorage.getItem("quiz_score");
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
+  const [isQuizFinished, setIsQuizFinished] = useState<boolean>(() => {
+    const saved = localStorage.getItem("quiz_is_finished");
+    return saved === "true";
+  });
+
+  // --- PERSISTENCE WRITING ---
+  useEffect(() => {
+    localStorage.setItem("quiz_current_index", currentQuestionIndex.toString());
+    localStorage.setItem("quiz_score", score.toString());
+    localStorage.setItem("quiz_is_finished", isQuizFinished.toString());
+    if (selectedAnswerIndex !== null) {
+      localStorage.setItem(
+        "quiz_selected_answer",
+        selectedAnswerIndex.toString(),
+      );
+    } else {
+      localStorage.removeItem("quiz_selected_answer");
+    }
+  }, [currentQuestionIndex, selectedAnswerIndex, score, isQuizFinished]);
+
+  const currentQuestion = questions[currentQuestionIndex];
+
+  // --- INTERACTION HANDLERS ---
+  const handleOptionClick = (optionIndex: number) => {
+    if (selectedAnswerIndex !== null) return;
+    setSelectedAnswerIndex(optionIndex);
+
+    if (optionIndex === currentQuestion.correctAnswer) {
+      setScore((prev) => prev + 1);
+    }
+  };
+
+  const handleNextClick = () => {
+    setSelectedAnswerIndex(null);
+    if (currentQuestionIndex + 1 < questions.length) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      setIsQuizFinished(true);
+    }
+  };
+
+  const handleRestartQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setSelectedAnswerIndex(null);
+    setScore(0);
+    setIsQuizFinished(false);
+    localStorage.clear(); // Clear storage for a clean reset
+  };
+
+  if (isQuizFinished) {
+    return (
+      <div className="app">
+        <ResultCard
+          score={score}
+          totalQuestions={questions.length}
+          onRestart={handleRestartQuiz}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="app">
-      <h1>Quiz App</h1>
-      <p>
-        {questions.length} question{questions.length !== 1 ? "s" : ""} loaded
-      </p>
+      <header className="quiz-header">
+        <h1>ACA Orientation Quiz</h1>
+        <div className="progress-tracker">
+          Question <strong>{currentQuestionIndex + 1}</strong> of{" "}
+          {questions.length}
+        </div>
+      </header>
 
-      {/*
-        This is your starting point. Build your quiz from here.
+      <span className="category-tag">
+        {currentQuestion.category.toUpperCase()}
+      </span>
 
-        Some things to figure out:
-        - How do you display one question at a time?
-        - How does the user select an answer?
-        - How do you track the score?
-        - How do you move to the next question?
-        - What happens when the quiz is done?
+      {/* Using our ultra-clean separated component wrapper */}
+      <QuestionCard
+        currentQuestion={currentQuestion}
+        selectedAnswerIndex={selectedAnswerIndex}
+        onOptionClick={handleOptionClick}
+      />
 
-        There's no single right way — make it your own.
-      */}
+      {selectedAnswerIndex !== null && (
+        <div className="feedback-box">
+          <p className="feedback-status">
+            {selectedAnswerIndex === currentQuestion.correctAnswer
+              ? "✅ Correct!"
+              : "❌ Incorrect"}
+          </p>
+          <p className="explanation-text">{currentQuestion.explanation}</p>
+          <button className="btn next-btn" onClick={handleNextClick}>
+            {currentQuestionIndex + 1 === questions.length
+              ? "Finish Quiz"
+              : "Next Question"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

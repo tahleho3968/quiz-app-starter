@@ -1,7 +1,258 @@
-/* Minimal reset — you own the design from here. */
+:root {
+  --bg-deep-charcoal: #121620;
+  --card-dark: #1b2030;
+  --neon-pink: #d9267c;
+  --neon-purple: #8a2be2;
+  --electric-blue: #00e5ff;
+  --text-pure: #ffffff;
+  --text-dim: #a0aec0;
+
+  --correct-glowing: #00ff87;
+  --incorrect-glowing: #ff3366;
+}
+
+/* Base Body Setup with Abstract Wave Background */
+body {
+  background-color: var(--bg-deep-charcoal);
+  /* Creates a smooth top header curve like the pink/purple blob in your screenshot */
+  background-image:
+    radial-gradient(
+      circle at 80% -20%,
+      rgba(219, 38, 124, 0.25) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 20% 110%,
+      rgba(0, 229, 255, 0.08) 0%,
+      transparent 60%
+    );
+  background-attachment: fixed;
+  color: var(--text-pure);
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
 .app {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header UI Elements */
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--text-pure) 40%, var(--text-dim));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.progress-tracker {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progress-tracker strong {
+  color: var(--electric-blue);
+}
+
+/* Elegant Pill Category Badge */
+.category-tag {
+  align-self: flex-start;
+  background: linear-gradient(
+    90deg,
+    rgba(219, 38, 124, 0.2),
+    rgba(138, 43, 226, 0.2)
+  );
+  color: var(--text-pure);
+  border: 1px solid var(--neon-pink);
+  padding: 0.35rem 1rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  box-shadow: 0 0 12px rgba(219, 38, 124, 0.2);
+}
+
+/* Deep Card Containers matching the screenshot style blocks */
+.card {
+  background-color: var(--card-dark);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft accent graphic node inside the card (the 'X' accent from your screen mockup) */
+.card::before {
+  content: "✕";
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  color: rgba(219, 38, 124, 0.2);
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.question-card h2 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-size: 1.45rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+/* Options Buttons Container */
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Interactive Modern Dark Buttons */
+.option-btn {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-pure);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.1rem 1.4rem;
+  border-radius: 14px;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover style pulling the glowing electric blue accent */
+.option-btn:hover:not(:disabled) {
+  border-color: var(--electric-blue);
+  background-color: rgba(0, 229, 255, 0.04);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 229, 255, 0.1);
+}
+
+/* Evaluated Answers Styling states */
+.option-btn.correct {
+  background-color: rgba(0, 255, 135, 0.1) !important;
+  border-color: var(--correct-glowing) !important;
+  color: var(--correct-glowing);
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(0, 255, 135, 0.15);
+}
+
+.option-btn.incorrect {
+  background-color: rgba(255, 51, 102, 0.1) !important;
+  border-color: var(--incorrect-glowing) !important;
+  color: var(--incorrect-glowing);
+  box-shadow: 0 0 15px rgba(255, 51, 102, 0.15);
+}
+
+.option-btn.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Bottom Explanation Boxes */
+.feedback-box {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  animation: slideUp 0.4s ease;
+}
+
+.feedback-status {
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.3px;
+}
+
+.explanation-text {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+/* Beautiful Action Buttons using the Softery Magenta Gradient */
+.btn {
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  color: var(--text-pure);
+  border: none;
+  padding: 1.1rem 1.8rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-shadow: 0 10px 20px rgba(219, 38, 124, 0.25);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(219, 38, 124, 0.4);
+  filter: brightness(1.1);
+}
+
+/* Results Overlay UI Box */
+.result-card {
+  text-align: center;
+  border: 1px solid rgba(219, 38, 124, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+}
+
+.score-summary {
+  font-size: 1.25rem;
+  color: var(--text-dim);
+}
+
+/* Large glowing digital readout matching countdown text */
+.percentage-badge {
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: var(--text-pure);
+  background: linear-gradient(135deg, #fff, var(--electric-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 2rem 0;
+  letter-spacing: -2px;
+  filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.3));
+}
+
+/* Micro-interactions animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
