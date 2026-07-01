@@ -6,15 +6,19 @@ import "./App.css";
 
 function App() {
   // --- STATE WITH LOCALSTORAGE PERSISTENCE INITIALIZERS ---
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(() => {
-    const saved = localStorage.getItem("quiz_current_index");
-    return saved ? parseInt(saved, 10) : 0;
-  });
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(
+    () => {
+      const saved = localStorage.getItem("quiz_current_index");
+      return saved ? parseInt(saved, 10) : 0;
+    },
+  );
 
-  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(() => {
-    const saved = localStorage.getItem("quiz_selected_answer");
-    return saved ? parseInt(saved, 10) : null;
-  });
+  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(
+    () => {
+      const saved = localStorage.getItem("quiz_selected_answer");
+      return saved ? parseInt(saved, 10) : null;
+    },
+  );
 
   const [score, setScore] = useState<number>(() => {
     const saved = localStorage.getItem("quiz_score");
@@ -32,13 +36,22 @@ function App() {
     localStorage.setItem("quiz_score", score.toString());
     localStorage.setItem("quiz_is_finished", isQuizFinished.toString());
     if (selectedAnswerIndex !== null) {
-      localStorage.setItem("quiz_selected_answer", selectedAnswerIndex.toString());
+      localStorage.setItem(
+        "quiz_selected_answer",
+        selectedAnswerIndex.toString(),
+      );
     } else {
       localStorage.removeItem("quiz_selected_answer");
     }
   }, [currentQuestionIndex, selectedAnswerIndex, score, isQuizFinished]);
 
   const currentQuestion = questions[currentQuestionIndex];
+  //Derived Values
+  const totalQuestions = questions.length;
+  const currentNumber = currentQuestionIndex + 1;
+
+  const percentage = Math.round((score / totalQuestions) * 100);
+  const progressPercent = (currentNumber / totalQuestions) * 100;
 
   // --- INTERACTION HANDLERS ---
   const handleOptionClick = (optionIndex: number) => {
@@ -84,20 +97,28 @@ function App() {
       <header className="quiz-header">
         <h1>ACA Orientation Quiz</h1>
         <div className="progress-tracker">
-          Question <strong>{currentQuestionIndex + 1}</strong> of {questions.length}
+          Question <strong>{currentNumber}</strong> of {totalQuestions}
+          {" | "} Score: <strong>{score}</strong> {" | "}
+          {percentage}%
         </div>
       </header>
-
+      /*===== Progress Bar ======*/
+      <div className="progress-bar-container">
+        <div className="progress-bar-bg">
+          <div
+            className="progress-bar-fill"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
       <span className="category-tag">
         {currentQuestion.category.toUpperCase()}
       </span>
-
       <QuestionCard
         currentQuestion={currentQuestion}
         selectedAnswerIndex={selectedAnswerIndex}
         onOptionClick={handleOptionClick}
       />
-
       {selectedAnswerIndex !== null && (
         <div className="feedback-box">
           <p className="feedback-status">
