@@ -4,7 +4,7 @@ interface QuestionCardProps {
   currentQuestion: Question;
   selectedAnswerIndex: number | null;
   onOptionClick: (index: number) => void;
-  currentQuestionIndex: number;
+  // ✂️ Removed currentQuestionIndex from interface
   isTransitioning: boolean;
 }
 
@@ -12,7 +12,7 @@ export function QuestionCard({
   currentQuestion,
   selectedAnswerIndex,
   onOptionClick,
-  currentQuestionIndex,
+  // ✂️ Removed currentQuestionIndex from destructuring
   isTransitioning,
 }: QuestionCardProps) {
   const hasAnswered = selectedAnswerIndex !== null;
@@ -42,7 +42,6 @@ export function QuestionCard({
     );
   };
 
-  // 🎛️ Dynamically assign classes to capture the 3s PowerPoint fade cycle
   const cardClassName = `card question-card ${isTransitioning ? "card-exit" : "slide-fade-in"}`;
 
   return (

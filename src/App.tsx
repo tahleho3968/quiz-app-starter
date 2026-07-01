@@ -121,7 +121,6 @@ function App() {
         currentQuestion={currentQuestion}
         selectedAnswerIndex={selectedAnswerIndex}
         onOptionClick={handleOptionClick}
-        currentQuestionIndex={currentQuestionIndex}
         isTransitioning={isTransitioning}
       />
 
