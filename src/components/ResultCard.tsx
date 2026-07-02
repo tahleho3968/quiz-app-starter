@@ -11,7 +11,10 @@ interface ResultCardProps {
   correctCount: number;
   totalQuestions: number;
   bestStreak: number;
+  timeBonus: number;
+  streakBonus: number;
   rank: number | null;
+  playerName: string;
   categoryBreakdown: CategoryBreakdownEntry[];
   onRestart: () => void;
   onChangeSettings: () => void;
@@ -26,24 +29,40 @@ const CATEGORY_LABELS: Record<Category, string> = {
   "html-css": "HTML / CSS",
 };
 
+const RANK_TITLES: Record<number, string> = {
+  1: "🏆 Quiz Master",
+  2: "🥈 Silver Scholar",
+  3: "🥉 Bronze Learner",
+};
+
+function getRankTitle(rank: number | null): string {
+  if (!rank) return "Keep Practicing! 📚";
+  if (rank <= 3) return RANK_TITLES[rank] || `#${rank} Competitor`;
+  if (rank <= 10) return `#${rank} Challenger`;
+  return `#${rank} Learner`;
+}
+
 export function ResultCard({
   score,
   correctCount,
   totalQuestions,
   bestStreak,
+  timeBonus,
+  streakBonus,
   rank,
+  playerName,
   categoryBreakdown,
   onRestart,
   onChangeSettings,
 }: ResultCardProps) {
-  const percent = Math.round((correctCount / totalQuestions) * 100);
+  const accuracy = Math.round((correctCount / totalQuestions) * 100);
 
   const headline =
-    percent === 100
+    accuracy === 100
       ? "Perfect run! 🏆"
-      : percent >= 80
+      : accuracy >= 80
         ? "Excellent work! 🌟"
-        : percent >= 50
+        : accuracy >= 50
           ? "Nice effort! 💪"
           : "Keep practicing! 📚";
 
@@ -54,23 +73,38 @@ export function ResultCard({
         You scored <strong>{correctCount}</strong> out of{" "}
         <strong>{totalQuestions}</strong>
       </p>
-      <div className="percentage-badge">{percent}%</div>
+      <div className="percentage-badge">{accuracy}%</div>
 
       <div className="stats-grid">
         <div className="stat-box">
           <span className="stat-value">{score}</span>
-          <span className="stat-label">Points</span>
+          <span className="stat-label">Total Points</span>
         </div>
         <div className="stat-box">
           <span className="stat-value">🔥 {bestStreak}</span>
           <span className="stat-label">Best Streak</span>
         </div>
+        <div className="stat-box">
+          <span className="stat-value">+{timeBonus}</span>
+          <span className="stat-label">Time Bonus</span>
+        </div>
+        {streakBonus > 0 && (
+          <div className="stat-box">
+            <span className="stat-value">+{streakBonus}</span>
+            <span className="stat-label">Streak Bonus</span>
+          </div>
+        )}
         {rank !== null && (
           <div className="stat-box">
             <span className="stat-value">#{rank}</span>
-            <span className="stat-label">Leaderboard</span>
+            <span className="stat-label">Rank</span>
           </div>
         )}
+      </div>
+
+      <div className="player-rank-section">
+        <p className="player-name">👤 {playerName}</p>
+        <p className="rank-title">{getRankTitle(rank)}</p>
       </div>
 
       {categoryBreakdown.length > 0 && (
