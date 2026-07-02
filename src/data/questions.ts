@@ -1,24 +1,34 @@
-import type { Question } from "../types/quiz";
-
-// This is an example question to show the data structure.
-// Replace it and add your own — you need at least 20 questions
-// spanning all six categories.
-
-const questions: Question[] = [
+const questions = [
   {
-    id: 1,
-    question: "What does `git clone` do?",
+    question: "What does git clone do?",
     options: [
-      "Creates a new branch",
-      "Downloads a repository from GitHub to your machine",
       "Uploads your code to GitHub",
+      "Downloads a repository from GitHub to your machine",
       "Deletes a repository",
+      "Creates a new branch"
     ],
-    correctAnswer: 1,
-    category: "git",
-    explanation:
-      "git clone creates a local copy of a remote repository, including its full commit history.",
+    answer: "Downloads a repository from GitHub to your machine"
   },
+  {
+    question: "What is React used for?",
+    options: [
+      "Backend development",
+      "Database management",
+      "Building user interfaces",
+      "Operating systems"
+    ],
+    answer: "Building user interfaces"
+  },
+  {
+    question: "What does npm stand for?",
+    options: [
+      "Node Package Manager",
+      "New Project Module",
+      "Node Programming Method",
+      "Network Process Manager"
+    ],
+    answer: "Node Package Manager"
+  }
 ];
 
 export default questions;
