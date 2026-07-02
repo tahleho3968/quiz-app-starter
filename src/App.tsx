@@ -3,6 +3,7 @@ import allQuestions from "./data/questions";
 import { QuestionCard } from "./components/QuestionCard";
 import { ResultCard } from "./components/ResultCard";
 import { SetupScreen } from "./components/SetupScreen";
+import { ReviewScreen } from "./components/ReviewScreen";
 import { DIFFICULTY_POINTS, DIFFICULTY_TIME_LIMIT } from "./types/quiz";
 import type {
   Category,
@@ -29,6 +30,17 @@ function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
+/**
+ * Returns a copy of the question with its options shuffled and
+ * `correctAnswer` remapped to point at the new position of the right option.
+ */
+function shuffleQuestionOptions(question: Question): Question {
+  const indices = shuffle(question.options.map((_, i) => i));
+  const options = indices.map((i) => question.options[i]);
+  const correctAnswer = indices.indexOf(question.correctAnswer);
+  return { ...question, options, correctAnswer };
+}
+
 function loadLeaderboard(): LeaderboardEntry[] {
   try {
     const raw = localStorage.getItem(LEADERBOARD_KEY);
@@ -42,10 +54,11 @@ function saveLeaderboard(entries: LeaderboardEntry[]) {
   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
 }
 
-type Screen = "setup" | "playing" | "finished";
+type Screen = "setup" | "playing" | "finished" | "review";
 
 interface AnswerRecord {
-  category: Category;
+  question: Question;
+  selectedIndex: number | null;
   correct: boolean;
 }
 
@@ -123,10 +136,10 @@ function App() {
   useEffect(() => {
     if (!timedOut || !currentQuestion) return;
     setStreak(0);
-    setAnswers((prev) => [
-      ...prev,
-      { category: currentQuestion.category, correct: false },
-    ]);
+  setAnswers((prev) => [
+    ...prev,
+    { question: currentQuestion, selectedIndex: null, correct: false },
+  ]);
   }, [timedOut]);
 
   const startQuiz = (
@@ -139,7 +152,7 @@ function App() {
         categories.includes(q.category) &&
         (difficulty === "all" || q.difficulty === difficulty),
     );
-    const runQuestions = shuffle(pool.length > 0 ? pool : allQuestions);
+    const runQuestions = shuffle(pool.length > 0 ? pool : allQuestions).map(shuffleQuestionOptions,);
 
     setPlayerName(name);
     setSelectedCategories(categories);
@@ -166,11 +179,15 @@ function App() {
     if (timerRef.current) clearInterval(timerRef.current);
     setSelectedAnswerIndex(optionIndex);
 
-    const isCorrect = optionIndex === currentQuestion.correctAnswer;
-    setAnswers((prev) => [
-      ...prev,
-      { category: currentQuestion.category, correct: isCorrect },
-    ]);
+  const isCorrect = optionIndex === currentQuestion.correctAnswer;
+  setAnswers((prev) => [
+    ...prev,
+    {
+      question: currentQuestion,
+      selectedIndex: optionIndex,
+      correct: isCorrect,
+    },
+  ]);
 
     if (isCorrect) {
       const basePoints = DIFFICULTY_POINTS[currentQuestion.difficulty];
@@ -244,16 +261,25 @@ function App() {
     setScreen("setup");
   };
 
+  const handleShowReview = () => {
+    setScreen("review");
+  };
+
+  const handleBackToResults = () => {
+    setScreen("finished");
+  };
+
   const categoryBreakdown = useMemo(() => {
     const byCategory = new Map<Category, { correct: number; total: number }>();
     for (const answer of answers) {
-      const entry = byCategory.get(answer.category) ?? {
+      const category = answer.question.category;
+      const entry = byCategory.get(category) ?? {
         correct: 0,
         total: 0,
       };
       entry.total += 1;
       if (answer.correct) entry.correct += 1;
-      byCategory.set(answer.category, entry);
+      byCategory.set(category, entry);
     }
     return Array.from(byCategory.entries()).map(([category, stats]) => ({
       category,
@@ -290,7 +316,16 @@ function App() {
           categoryBreakdown={categoryBreakdown}
           onRestart={handleRestartSameSetup}
           onChangeSettings={handleChangeSettings}
+          onReview={handleShowReview}
         />
+      </div>
+    );
+  }
+
+  if (screen === "review") {
+    return (
+      <div className="app">
+        <ReviewScreen answers={answers} onBack={handleBackToResults} />
       </div>
     );
   }

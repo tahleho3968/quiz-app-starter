@@ -18,6 +18,7 @@ interface ResultCardProps {
   categoryBreakdown: CategoryBreakdownEntry[];
   onRestart: () => void;
   onChangeSettings: () => void;
+  onReview: () => void; 
 }
 
 const CATEGORY_LABELS: Record<Category, string> = {
@@ -54,6 +55,7 @@ export function ResultCard({
   categoryBreakdown,
   onRestart,
   onChangeSettings,
+  onReview,
 }: ResultCardProps) {
   const accuracy = Math.round((correctCount / totalQuestions) * 100);
 
@@ -126,6 +128,9 @@ export function ResultCard({
       <div className="result-actions">
         <button className="btn restart-btn" onClick={onRestart}>
           Play Same Setup Again
+        </button>
+        <button className="btn btn-secondary" onClick={onReview}>
+          Review Answers
         </button>
         <button className="btn btn-secondary" onClick={onChangeSettings}>
           Change Categories / Difficulty
