@@ -8,8 +8,7 @@ function Welcome({ totalQuestions, onStart }: WelcomeProps) {
     <div className="welcome">
       <h1>🧠 Quiz App</h1>
       <p className="description">
-        Test your knowledge of Git, GitHub, React, TypeScript, HTML, CSS,
-        Vite, ESLint, Prettier and Vercel.
+        Test your knowledge of Git, GitHub, React, TypeScript, HTML, CSS, ESLint, Prettier and Vercel.
       </p>
       <div className="info">
         <p>📝 {totalQuestions} Questions</p>
