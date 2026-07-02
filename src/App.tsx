@@ -108,12 +108,14 @@ function App() {
   const [bestStreak, setBestStreak] = useState(0);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [sessionTimeLeft, setSessionTimeLeft] = useState(0);
   const [lastRank, setLastRank] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState(false);
   const [answerTimes, setAnswerTimes] = useState<number[]>([]);
   const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sessionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const currentQuestion = quizQuestions[currentIndex];
   const timeLimit = currentQuestion
@@ -129,6 +131,31 @@ function App() {
     }
     return counts;
   }, []);
+
+  // --- Session timer for Timed mode ---
+  useEffect(() => {
+    if (screen !== "playing" || gameMode !== "timed") return;
+    if (sessionTimeLeft <= 0) {
+      // Time's up! Finish the quiz
+      finishQuiz();
+      return;
+    }
+
+    sessionTimerRef.current = setInterval(() => {
+      setSessionTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
+          finishQuiz();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
+    };
+  }, [screen, gameMode, sessionTimeLeft]);
 
   // --- Countdown timer for the active question ---
   useEffect(() => {
@@ -186,54 +213,50 @@ function App() {
     setSelectedCategories(categories);
     setDifficultyFilter(difficulty);
 
-    const pool = allQuestions.filter(
+    const filteredPool = allQuestions.filter(
       (q) =>
         categories.includes(q.category) &&
         (difficulty === "all" || q.difficulty === difficulty),
     );
+    const safePool = filteredPool.length > 0 ? filteredPool : allQuestions;
 
-    // For daily mode, use seeded shuffle
     let runQuestions: Question[];
-    if (mode === "daily") {
-      const seed = getDailySeed();
-      runQuestions = seededShuffle(
-        pool.length > 0 ? pool : allQuestions,
-        seed,
-      ).map(shuffleQuestionOptions);
-    } else {
-      runQuestions = shuffle(pool.length > 0 ? pool : allQuestions).map(
-        shuffleQuestionOptions,
-      );
-    }
 
-    // For marathon, use all questions
-    if (mode === "marathon") {
-      runQuestions = shuffle(allQuestions).map(shuffleQuestionOptions);
-    }
-
-    // For category-lock, use only selected category
-    if (mode === "category-lock" && categories.length === 1) {
-      runQuestions = shuffle(
-        allQuestions.filter((q) => q.category === categories[0]),
-      ).map(shuffleQuestionOptions);
-    }
-
-    // For survival, start with easy questions
-    if (mode === "survival") {
-      const easy = allQuestions.filter((q) => q.difficulty === "easy");
-      const medium = allQuestions.filter((q) => q.difficulty === "medium");
-      const hard = allQuestions.filter((q) => q.difficulty === "hard");
-      runQuestions = shuffle([...easy, ...medium, ...hard]).map(
-        shuffleQuestionOptions,
-      );
-    }
-
-    // For timed mode, get as many as possible
-    if (mode === "timed") {
-      runQuestions = shuffle(pool).map(shuffleQuestionOptions);
-      setTimeLeft(TIMED_MODE_LIMIT);
-    } else {
-      setTimeLeft(DIFFICULTY_TIME_LIMIT[runQuestions[0]?.difficulty || "easy"]);
+    switch (mode) {
+      case "daily": {
+        // Everyone gets the exact same question set today, regardless of
+        // whatever category/difficulty filters they had selected — that's
+        // what makes Share Card results actually comparable between players.
+        const seed = getDailySeed();
+        runQuestions = seededShuffle(allQuestions, seed).map(
+          shuffleQuestionOptions,
+        );
+        break;
+      }
+      case "marathon":
+        runQuestions = shuffle(allQuestions).map(shuffleQuestionOptions);
+        break;
+      case "category-lock":
+        // SetupScreen guarantees exactly one category is selected before
+        // this mode can be started.
+        runQuestions = shuffle(
+          allQuestions.filter((q) => q.category === categories[0]),
+        ).map(shuffleQuestionOptions);
+        break;
+      case "survival": {
+        const easy = allQuestions.filter((q) => q.difficulty === "easy");
+        const medium = allQuestions.filter((q) => q.difficulty === "medium");
+        const hard = allQuestions.filter((q) => q.difficulty === "hard");
+        runQuestions = shuffle([...easy, ...medium, ...hard]).map(
+          shuffleQuestionOptions,
+        );
+        break;
+      }
+      case "timed":
+      case "classic":
+      default:
+        runQuestions = shuffle(safePool).map(shuffleQuestionOptions);
+        break;
     }
 
     setQuizQuestions(runQuestions);
@@ -252,6 +275,8 @@ function App() {
     setLastRank(null);
     setGameOver(false);
     setQuestionStartTime(Date.now());
+    setTimeLeft(DIFFICULTY_TIME_LIMIT[runQuestions[0]?.difficulty ?? "easy"]);
+    setSessionTimeLeft(mode === "timed" ? TIMED_MODE_LIMIT : 0);
     setScreen("playing");
   };
 
@@ -294,13 +319,17 @@ function App() {
     // Update total answered
     updateTotalAnswered(quizQuestions.length);
 
+    // For Survival mode, use actual attempted questions count
+    const totalAttempted =
+      gameMode === "survival" ? answers.length : quizQuestions.length;
+
     // Save to leaderboard
     const entry: LeaderboardEntry = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name: playerName,
       score,
       correct: correctCount,
-      total: quizQuestions.length,
+      total: totalAttempted,
       bestStreak,
       categories:
         selectedCategories.length === ALL_CATEGORIES.length
@@ -360,7 +389,7 @@ function App() {
       // Survival mode: game over on wrong answer
       if (gameMode === "survival") {
         setGameOver(true);
-        setTimeout(() => finishQuiz(), 1000);
+        // Don't call finishQuiz here - let the user click "See Results"
       }
     }
   };
@@ -396,7 +425,15 @@ function App() {
       if (currentIndex + 1 < quizQuestions.length) {
         const nextIndex = currentIndex + 1;
         setCurrentIndex(nextIndex);
-        setTimeLeft(DIFFICULTY_TIME_LIMIT[quizQuestions[nextIndex].difficulty]);
+        // Only reset timeLeft for non-timed modes
+        if (gameMode !== "timed") {
+          setTimeLeft(
+            DIFFICULTY_TIME_LIMIT[quizQuestions[nextIndex].difficulty],
+          );
+        } else {
+          // For timed mode, keep the session timer running
+          setTimeLeft(DIFFICULTY_TIME_LIMIT[quizQuestions[nextIndex].difficulty]);
+        }
         setIsTransitioning(false);
       } else {
         setIsTransitioning(false);
@@ -521,7 +558,7 @@ function App() {
           Correct: {correctCount}/{answers.length}
         </span>
         {gameMode === "timed" && (
-          <span className="score-strip-item">⏱️ {timeLeft}s</span>
+          <span className="score-strip-item">⏱️ {sessionTimeLeft}s</span>
         )}
         {gameMode === "survival" && (
           <span className="score-strip-item">💀 Survival Mode</span>

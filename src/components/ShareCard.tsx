@@ -21,13 +21,16 @@ export function ShareCard({ answers, score, totalQuestions, playerName, mode = "
   const generateShareText = () => {
     const percentage = Math.round((score / totalQuestions) * 100);
     const date = new Date().toLocaleDateString();
-    
-    // Wordle-style grid: 🟩 = correct, 🟨 = wrong, ⬜ = skipped/timed out
+
+    // Wordle-style grid: 🟩 = correct, 🟥 = wrong, ⬜ = skipped/timed out
     const grid = answers.map((answer) => {
       if (answer.correct) return "🟩";
       if (answer.selectedIndex !== null) return "🟥";
       return "⬜";
     }).join("");
+
+    // Group grid into rows of 5 for readability
+    const gridRows = grid.match(/.{1,5}/g)?.join("\n") || grid;
 
     // Count how many of each
     const correctCount = answers.filter(a => a.correct).length;
@@ -38,11 +41,11 @@ export function ShareCard({ answers, score, totalQuestions, playerName, mode = "
 
 ${playerName} scored ${score}/${totalQuestions} (${percentage}%)
 
-${grid}
+${gridRows}
 
-${'🟩'.repeat(Math.min(correctCount, 5))} Correct: ${correctCount}
-${'🟥'.repeat(Math.min(wrongCount, 5))} Wrong: ${wrongCount}
-${'⬜'.repeat(Math.min(skippedCount, 5))} Skipped: ${skippedCount}
+🟩 Correct: ${correctCount}
+🟥 Wrong: ${wrongCount}
+⬜ Skipped: ${skippedCount}
 
 Mode: ${mode}
 Can you beat my score? 🎯
@@ -56,7 +59,7 @@ Can you beat my score? 🎯
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      // Fallback
+      // Fallback for older browsers
       const textarea = document.createElement('textarea');
       textarea.value = text;
       document.body.appendChild(textarea);
@@ -72,7 +75,7 @@ Can you beat my score? 🎯
     <div className="share-card card">
       <h3>📤 Share Your Result</h3>
       <p className="share-subtitle">Copy and paste this in your group chat!</p>
-      
+
       <div className="share-preview">
         <pre className="share-text">{generateShareText()}</pre>
       </div>

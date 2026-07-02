@@ -23,7 +23,7 @@ export interface BadgeStats {
   averageTime: number;
   categoryBreakdown: { category: Category; correct: number; total: number }[];
   perfectCategories: Category[];
-  comeback: boolean; // Started with wrong answers but finished strong
+  comeback: boolean;
 }
 
 const BADGE_DEFINITIONS: Badge[] = [
@@ -77,6 +77,27 @@ const BADGE_DEFINITIONS: Badge[] = [
     unlocked: false,
   },
   {
+    id: "dev-tools-master",
+    name: "Dev Tools Master",
+    icon: "🔧",
+    description: "100% correct on Tooling questions",
+    unlocked: false,
+  },
+  {
+    id: "deployment-pro",
+    name: "Deployment Pro",
+    icon: "🚀",
+    description: "100% correct on Deployment questions",
+    unlocked: false,
+  },
+  {
+    id: "stylist",
+    name: "CSS Stylist",
+    icon: "🎨",
+    description: "100% correct on HTML/CSS questions",
+    unlocked: false,
+  },
+  {
     id: "comeback-kid",
     name: "Comeback Kid",
     icon: "💪",
@@ -107,7 +128,6 @@ export function useBadges() {
       const saved = localStorage.getItem(BADGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Merge with definitions to keep new badges
         return BADGE_DEFINITIONS.map((def) => {
           const existing = parsed.find((b: Badge) => b.id === def.id);
           return existing || def;
@@ -161,19 +181,21 @@ export function useBadges() {
       toUnlock.push("hot-streak");
     }
 
-    // Category Masters
+    // Category Masters - Fixed mapping!
+    const badgeMap: Record<Category, string | null> = {
+      git: "git-master",
+      react: "react-pro",
+      typescript: "typescript-guru",
+      tooling: "dev-tools-master",
+      deployment: "deployment-pro",
+      "html-css": "stylist",
+    };
+
     stats.categoryBreakdown.forEach((cat) => {
       if (cat.correct === cat.total && cat.total >= 3) {
-        const badgeMap: Record<Category, string> = {
-          git: "git-master",
-          react: "react-pro",
-          typescript: "typescript-guru",
-          tooling: "typescript-guru",
-          deployment: "typescript-guru",
-          "html-css": "typescript-guru",
-        };
-        if (badgeMap[cat.category]) {
-          toUnlock.push(badgeMap[cat.category]);
+        const badgeId = badgeMap[cat.category];
+        if (badgeId) {
+          toUnlock.push(badgeId);
         }
       }
     });

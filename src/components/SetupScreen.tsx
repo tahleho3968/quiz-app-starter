@@ -1,5 +1,10 @@
 import { useState } from "react";
-import type { Category, Difficulty, GameMode, LeaderboardEntry } from "../types/quiz";
+import type {
+  Category,
+  Difficulty,
+  GameMode,
+  LeaderboardEntry,
+} from "../types/quiz";
 
 interface SetupScreenProps {
   categories: Category[];
@@ -25,13 +30,48 @@ const CATEGORY_LABELS: Record<Category, string> = {
 
 const DIFFICULTIES: (Difficulty | "all")[] = ["all", "easy", "medium", "hard"];
 
-const GAME_MODES: { id: GameMode; label: string; icon: string; description: string }[] = [
-  { id: "classic", label: "Classic", icon: "📝", description: "20 questions, score" },
-  { id: "timed", label: "Timed", icon: "⏱️", description: "5 minutes, as many as possible" },
-  { id: "survival", label: "Survival", icon: "💀", description: "One wrong = game over!" },
-  { id: "marathon", label: "Marathon", icon: "🏃", description: "All questions, no breaks" },
-  { id: "daily", label: "Daily Challenge", icon: "📅", description: "Same questions for everyone" },
-  { id: "category-lock", label: "Category Lock", icon: "🎯", description: "Only one category" },
+const GAME_MODES: {
+  id: GameMode;
+  label: string;
+  icon: string;
+  description: string;
+}[] = [
+  {
+    id: "classic",
+    label: "Classic",
+    icon: "📝",
+    description: "20 questions, score",
+  },
+  {
+    id: "timed",
+    label: "Timed",
+    icon: "⏱️",
+    description: "5 minutes, as many as possible",
+  },
+  {
+    id: "survival",
+    label: "Survival",
+    icon: "💀",
+    description: "One wrong = game over!",
+  },
+  {
+    id: "marathon",
+    label: "Marathon",
+    icon: "🏃",
+    description: "All questions, no breaks",
+  },
+  {
+    id: "daily",
+    label: "Daily Challenge",
+    icon: "📅",
+    description: "Same questions for everyone",
+  },
+  {
+    id: "category-lock",
+    label: "Category Lock",
+    icon: "🎯",
+    description: "Only one category",
+  },
 ];
 
 export function SetupScreen({
@@ -70,6 +110,22 @@ export function SetupScreen({
     if (!/[A-Za-z]/.test(trimmedName)) {
       setNameError("Your name must contain letters.");
       return;
+    }
+
+    // Category Lock requires exactly one category
+    if (gameMode === "category-lock") {
+      if (selectedCategories.length === 0) {
+        setNameError(
+          "Please select a category for Category Lock mode (click on a category above)",
+        );
+        return;
+      }
+      if (selectedCategories.length > 1) {
+        setNameError(
+          "Please select exactly ONE category for Category Lock mode",
+        );
+        return;
+      }
     }
 
     setNameError(null);
@@ -153,7 +209,7 @@ export function SetupScreen({
         </div>
       </div>
 
-      {/* 🆕 GAME MODES SECTION */}
+      {/* Game Mode Selector */}
       <div className="setup-section">
         <span className="setup-label">🎮 Game Mode</span>
         <div className="game-mode-grid">
