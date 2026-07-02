@@ -10,6 +10,21 @@
   --incorrect-glowing: #ff3366;
 }
 
+.input-with-overlay {
+  position: relative;
+}
+
+.setup-input-error {
+  border-color: #e5484d;
+}
+
+.input-error-overlay {
+  margin-top: 6px;
+  color: #e5484d;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
 body {
   background-color: var(--bg-deep-charcoal);
   background-image:
@@ -460,7 +475,11 @@ body {
 }
 
 .chip-active {
-  background: linear-gradient(90deg, rgba(219, 38, 124, 0.25), rgba(138, 43, 226, 0.25));
+  background: linear-gradient(
+    90deg,
+    rgba(219, 38, 124, 0.25),
+    rgba(138, 43, 226, 0.25)
+  );
   border-color: var(--neon-pink);
   color: var(--text-pure);
 }
@@ -723,7 +742,6 @@ body {
   filter: brightness(1.15);
 }
 
-
 /* ============================================
    Welcome Screen Styles
    ============================================ */
@@ -737,7 +755,11 @@ body {
 .welcome h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, var(--text-pure) 40%, var(--electric-blue));
+  background: linear-gradient(
+    135deg,
+    var(--text-pure) 40%,
+    var(--electric-blue)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
