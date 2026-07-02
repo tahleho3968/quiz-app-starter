@@ -60,18 +60,10 @@ export function QuestionCard({
   const timePercent = Math.max(0, Math.min(100, (timeLeft / timeLimit) * 100));
   const timerUrgent = timeLeft <= Math.ceil(timeLimit * 0.25) && !hasAnswered;
 
-<<<<<<< HEAD
-  // Absolute completion percentage — counts the question currently on screen
-  // as "in progress" toward the total, reaching 100% on the final question.
+  // Progress percentage - counts questions completed
   const progressPercent =
     totalQuestions > 0
       ? Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)
-=======
-  // Calculates absolute completion percentage (moves forward right/wrong, freezes if unanswered)
-  const progressPercent =
-    totalQuestions > 0
-      ? Math.round((currentQuestionIndex / totalQuestions) * 100)
->>>>>>> master
       : 0;
 
   return (
@@ -97,8 +89,7 @@ export function QuestionCard({
         {hasAnswered ? "Time's up" : `${timeLeft}s left`}
       </div>
 
-<<<<<<< HEAD
-      {/* Overall quiz progress tracker */}
+      {/* Progress bar with class-based styling */}
       <div className="progress-bar-wrap">
         <div className="progress-bar-track">
           <div
@@ -107,41 +98,6 @@ export function QuestionCard({
           />
         </div>
         <div className="progress-bar-label">{progressPercent}% Complete</div>
-=======
-      {/* Clean Custom Progress Bar Tracker */}
-      <div style={{ width: "100%", marginTop: "14px", marginBottom: "18px" }}>
-        <div
-          style={{
-            width: "100%",
-            backgroundColor: "#2d3748",
-            borderRadius: "9999px",
-            height: "12px",
-            overflow: "hidden",
-            border: "1px solid #4a5568",
-          }}
-        >
-          <div
-            style={{
-              width: `${progressPercent}%`,
-              backgroundColor: "#c70063ff",
-              height: "100%",
-              borderRadius: "9999px",
-              transition: "width 0.4s ease-out",
-            }}
-          />
-        </div>
-        <div
-          style={{
-            textAlign: "right",
-            fontSize: "0.8rem",
-            color: "#a0aec0",
-            marginTop: "5px",
-            fontWeight: "500",
-          }}
-        >
-          {progressPercent}% Complete
-        </div>
->>>>>>> master
       </div>
 
       <h2>{currentQuestion.question}</h2>

@@ -125,16 +125,17 @@ export function ResultCard({
         </div>
       )}
 
-  <div className="result-actions">
-    <button className="btn restart-btn" onClick={onRestart}>
-      Play Same Setup Again
-    </button>
-    <button className="btn btn-secondary" onClick={onReview}>
-      Review Answers
-    </button>
-    <button className="btn btn-secondary" onClick={onChangeSettings}>
-      Change Categories / Difficulty
-    </button>
-  </div>
+      <div className="result-actions">
+        <button className="btn restart-btn" onClick={onRestart}>
+          Play Same Setup Again
+        </button>
+        <button className="btn btn-secondary" onClick={onReview}>
+          Review Answers
+        </button>
+        <button className="btn btn-secondary" onClick={onChangeSettings}>
+          Change Categories / Difficulty
+        </button>
+      </div>
+    </div>
   );
 }
