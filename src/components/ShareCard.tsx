@@ -58,7 +58,7 @@ Can you beat my score? 🎯
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       // Fallback for older browsers
       const textarea = document.createElement('textarea');
       textarea.value = text;

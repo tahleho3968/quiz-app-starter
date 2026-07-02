@@ -113,6 +113,7 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
   const [answerTimes, setAnswerTimes] = useState<number[]>([]);
   const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
+  const [autoFinishPending, setAutoFinishPending] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sessionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -194,12 +195,31 @@ function App() {
     ]);
     setAnswerTimes((prev) => [...prev, timeTaken]);
 
-    // Survival mode: game over on wrong answer
+    // Survival mode: game over on timeout.
+    // We don't call finishQuiz() directly here — at this point in the effect,
+    // React hasn't yet re-rendered with the answer we just pushed above, so
+    // finishQuiz would run with a stale `answers` array missing this last
+    // attempt. Instead we flip a flag and let a dedicated effect (below)
+    // handle the delayed call once the render has caught up.
     if (gameMode === "survival") {
       setGameOver(true);
-      setTimeout(() => finishQuiz(), 1000);
+      setAutoFinishPending(true);
     }
   }, [timedOut]);
+
+  // Handles the delayed auto-finish for Survival mode timeouts. Runs on the
+  // render *after* the final answer has been committed to state, so
+  // finishQuiz() below always sees the complete `answers` array.
+  useEffect(() => {
+    if (!autoFinishPending) return;
+
+    const timeout = setTimeout(() => {
+      finishQuiz();
+      setAutoFinishPending(false);
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [autoFinishPending]);
 
   // --- Setup Quiz ---
   const startQuiz = (
@@ -253,9 +273,15 @@ function App() {
         break;
       }
       case "timed":
+        runQuestions = shuffle(safePool).map(shuffleQuestionOptions);
+        break;
       case "classic":
       default:
-        runQuestions = shuffle(safePool).map(shuffleQuestionOptions);
+        // Classic mode advertises "20 questions" in the mode picker —
+        // cap it here so the label and the actual run always match.
+        runQuestions = shuffle(safePool)
+          .slice(0, 20)
+          .map(shuffleQuestionOptions);
         break;
     }
 
