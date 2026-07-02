@@ -699,6 +699,11 @@ body {
   border-radius: 10px;
   padding: 0.5rem 0.8rem;
   font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.breakdown-item:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .breakdown-score {
@@ -722,7 +727,6 @@ body {
   box-shadow: none;
   filter: brightness(1.15);
 }
-
 
 /* ============================================
    Welcome Screen Styles
@@ -779,4 +783,30 @@ body {
 .welcome button:hover {
   transform: translateY(-2px);
   filter: brightness(1.1);
+}
+
+/* ============================================
+   Better Results Page Styles
+   ============================================ */
+
+.player-rank-section {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.player-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-pure);
+  margin-bottom: 0.3rem;
+}
+
+.rank-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--electric-blue);
 }

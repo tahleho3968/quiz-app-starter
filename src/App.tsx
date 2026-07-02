@@ -72,6 +72,8 @@ function App() {
   const [timedOut, setTimedOut] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [score, setScore] = useState(0);
+  const [timeBonusTotal, setTimeBonusTotal] = useState(0);
+  const [streakBonusTotal, setStreakBonusTotal] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
@@ -148,6 +150,8 @@ function App() {
     setTimedOut(false);
     setIsTransitioning(false);
     setScore(0);
+    setTimeBonusTotal(0);
+    setStreakBonusTotal(0);
     setCorrectCount(0);
     setStreak(0);
     setBestStreak(0);
@@ -176,6 +180,8 @@ function App() {
         nextStreak >= 3 ? 25 * Math.min(nextStreak - 2, 10) : 0;
 
       setScore((prev) => prev + basePoints + speedBonus + streakBonus);
+      setTimeBonusTotal((prev) => prev + speedBonus);
+      setStreakBonusTotal((prev) => prev + streakBonus);
       setCorrectCount((prev) => prev + 1);
       setStreak(nextStreak);
       setBestStreak((prev) => Math.max(prev, nextStreak));
@@ -277,7 +283,10 @@ function App() {
           correctCount={correctCount}
           totalQuestions={quizQuestions.length}
           bestStreak={bestStreak}
+          timeBonus={timeBonusTotal}
+          streakBonus={streakBonusTotal}
           rank={lastRank}
+          playerName={playerName}
           categoryBreakdown={categoryBreakdown}
           onRestart={handleRestartSameSetup}
           onChangeSettings={handleChangeSettings}
