@@ -1,7 +1,28 @@
 export type Category =
-  "git" | "react" | "typescript" | "tooling" | "deployment" | "html-css";
+  | "git"
+  | "react"
+  | "typescript"
+  | "tooling"
+  | "deployment"
+  | "html-css";
 
 export type Difficulty = "easy" | "medium" | "hard";
+
+export type QuestionType =
+  | "multiple-choice"
+  | "true-false"
+  | "fill-blank"
+  | "code-snippet"
+  | "matching"
+  | "ordering";
+
+export type GameMode =
+  | "classic"
+  | "timed"
+  | "survival"
+  | "marathon"
+  | "daily"
+  | "category-lock";
 
 export interface Question {
   id: number;
@@ -11,16 +32,15 @@ export interface Question {
   category: Category;
   difficulty: Difficulty;
   explanation: string;
+  type?: QuestionType; // Optional for future expansion
 }
 
-/** Points awarded for a correct answer at each difficulty level. */
 export const DIFFICULTY_POINTS: Record<Difficulty, number> = {
   easy: 100,
   medium: 150,
   hard: 200,
 };
 
-/** How many seconds a player gets to answer a question at each difficulty. */
 export const DIFFICULTY_TIME_LIMIT: Record<Difficulty, number> = {
   easy: 20,
   medium: 15,
@@ -37,4 +57,6 @@ export interface LeaderboardEntry {
   categories: string;
   difficulty: string;
   date: string;
+  mode?: GameMode;
+  avgTime?: number;
 }

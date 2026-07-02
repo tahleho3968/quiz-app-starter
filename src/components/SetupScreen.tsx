@@ -1,14 +1,16 @@
 import { useState } from "react";
-import type { Category, Difficulty, LeaderboardEntry } from "../types/quiz";
+import type { Category, Difficulty, GameMode, LeaderboardEntry } from "../types/quiz";
 
 interface SetupScreenProps {
   categories: Category[];
   questionCounts: Record<Category, number>;
   leaderboard: LeaderboardEntry[];
+  badgeCount?: string;
   onStart: (
     selectedCategories: Category[],
     difficulty: Difficulty | "all",
     playerName: string,
+    gameMode: GameMode,
   ) => void;
 }
 
@@ -23,15 +25,26 @@ const CATEGORY_LABELS: Record<Category, string> = {
 
 const DIFFICULTIES: (Difficulty | "all")[] = ["all", "easy", "medium", "hard"];
 
+const GAME_MODES: { id: GameMode; label: string; icon: string; description: string }[] = [
+  { id: "classic", label: "Classic", icon: "📝", description: "20 questions, score" },
+  { id: "timed", label: "Timed", icon: "⏱️", description: "5 minutes, as many as possible" },
+  { id: "survival", label: "Survival", icon: "💀", description: "One wrong = game over!" },
+  { id: "marathon", label: "Marathon", icon: "🏃", description: "All questions, no breaks" },
+  { id: "daily", label: "Daily Challenge", icon: "📅", description: "Same questions for everyone" },
+  { id: "category-lock", label: "Category Lock", icon: "🎯", description: "Only one category" },
+];
+
 export function SetupScreen({
   categories,
   questionCounts,
   leaderboard,
+  badgeCount,
   onStart,
 }: SetupScreenProps) {
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
   const [playerName, setPlayerName] = useState("");
+  const [gameMode, setGameMode] = useState<GameMode>("classic");
   const [nameError, setNameError] = useState<string | null>(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -60,7 +73,7 @@ export function SetupScreen({
     }
 
     setNameError(null);
-    onStart(effectiveCategories, difficulty, trimmedName);
+    onStart(effectiveCategories, difficulty, trimmedName, gameMode);
   };
 
   const topScores = [...leaderboard]
@@ -139,6 +152,33 @@ export function SetupScreen({
           ))}
         </div>
       </div>
+
+      {/* 🆕 GAME MODES SECTION */}
+      <div className="setup-section">
+        <span className="setup-label">🎮 Game Mode</span>
+        <div className="game-mode-grid">
+          {GAME_MODES.map((mode) => (
+            <button
+              key={mode.id}
+              type="button"
+              className={`game-mode-chip ${gameMode === mode.id ? "game-mode-chip-active" : ""}`}
+              onClick={() => setGameMode(mode.id)}
+            >
+              <span className="game-mode-icon">{mode.icon}</span>
+              <span className="game-mode-label">{mode.label}</span>
+              <span className="game-mode-desc">{mode.description}</span>
+            </button>
+          ))}
+        </div>
+        <p className="setup-hint">
+          {GAME_MODES.find((m) => m.id === gameMode)?.description}
+        </p>
+      </div>
+
+      {/* Badge Counter */}
+      {badgeCount && (
+        <div className="badge-counter">🏅 {badgeCount} Badges</div>
+      )}
 
       <button className="btn start-btn" onClick={handleStart}>
         Start Quiz

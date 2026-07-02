@@ -4,10 +4,15 @@ import { QuestionCard } from "./components/QuestionCard";
 import { ResultCard } from "./components/ResultCard";
 import { SetupScreen } from "./components/SetupScreen";
 import { ReviewScreen } from "./components/ReviewScreen";
+import { ShareCard } from "./components/ShareCard";
+import { BadgeToast } from "./components/BadgeToast";
+import { useBadges } from "./hooks/useBadges";
+import { seededShuffle, getDailySeed } from "./utils/seededRandom";
 import { DIFFICULTY_POINTS, DIFFICULTY_TIME_LIMIT } from "./types/quiz";
 import type {
   Category,
   Difficulty,
+  GameMode,
   LeaderboardEntry,
   Question,
 } from "./types/quiz";
@@ -16,6 +21,7 @@ import "./App.css";
 const LEADERBOARD_KEY = "aca_quiz_leaderboard";
 const TRANSITION_MS = 1200;
 const MAX_LEADERBOARD_ENTRIES = 50;
+const TIMED_MODE_LIMIT = 300; // 5 minutes
 
 const ALL_CATEGORIES: Category[] = Array.from(
   new Set(allQuestions.map((q) => q.category)),
@@ -30,10 +36,6 @@ function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
-/**
- * Returns a copy of the question with its options shuffled and
- * `correctAnswer` remapped to point at the new position of the right option.
- */
 function shuffleQuestionOptions(question: Question): Question {
   const indices = shuffle(question.options.map((_, i) => i));
   const options = indices.map((i) => question.options[i]);
@@ -60,6 +62,7 @@ interface AnswerRecord {
   question: Question;
   selectedIndex: number | null;
   correct: boolean;
+  timeToAnswer?: number;
 }
 
 function App() {
@@ -68,6 +71,18 @@ function App() {
     loadLeaderboard(),
   );
 
+  // --- Badges ---
+  const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    badges: _badges,
+    newBadge,
+    checkBadges,
+    updateTotalAnswered,
+    clearNewBadge,
+    getUnlockedCount,
+    getTotalBadges,
+  } = useBadges();
+
   // --- Run configuration ---
   const [playerName, setPlayerName] = useState("Player");
   const [selectedCategories, setSelectedCategories] =
@@ -75,6 +90,7 @@ function App() {
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | "all">(
     "all",
   );
+  const [gameMode, setGameMode] = useState<GameMode>("classic");
 
   // --- Active run state ---
   const [quizQuestions, setQuizQuestions] = useState<Question[]>([]);
@@ -93,6 +109,9 @@ function App() {
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [timeLeft, setTimeLeft] = useState(0);
   const [lastRank, setLastRank] = useState<number | null>(null);
+  const [gameOver, setGameOver] = useState(false);
+  const [answerTimes, setAnswerTimes] = useState<number[]>([]);
+  const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -132,31 +151,91 @@ function App() {
     };
   }, [screen, currentIndex, selectedAnswerIndex, timedOut, isTransitioning]);
 
-  // When a question times out with no answer, record it as incorrect and break the streak.
+  // When a question times out
   useEffect(() => {
     if (!timedOut || !currentQuestion) return;
     setStreak(0);
-  setAnswers((prev) => [
-    ...prev,
-    { question: currentQuestion, selectedIndex: null, correct: false },
-  ]);
+    const timeTaken = Date.now() - questionStartTime;
+    setAnswers((prev) => [
+      ...prev,
+      {
+        question: currentQuestion,
+        selectedIndex: null,
+        correct: false,
+        timeToAnswer: timeTaken,
+      },
+    ]);
+    setAnswerTimes((prev) => [...prev, timeTaken]);
+
+    // Survival mode: game over on wrong answer
+    if (gameMode === "survival") {
+      setGameOver(true);
+      setTimeout(() => finishQuiz(), 1000);
+    }
   }, [timedOut]);
 
+  // --- Setup Quiz ---
   const startQuiz = (
     categories: Category[],
     difficulty: Difficulty | "all",
     name: string,
+    mode: GameMode = "classic",
   ) => {
+    setGameMode(mode);
+    setPlayerName(name);
+    setSelectedCategories(categories);
+    setDifficultyFilter(difficulty);
+
     const pool = allQuestions.filter(
       (q) =>
         categories.includes(q.category) &&
         (difficulty === "all" || q.difficulty === difficulty),
     );
-    const runQuestions = shuffle(pool.length > 0 ? pool : allQuestions).map(shuffleQuestionOptions,);
 
-    setPlayerName(name);
-    setSelectedCategories(categories);
-    setDifficultyFilter(difficulty);
+    // For daily mode, use seeded shuffle
+    let runQuestions: Question[];
+    if (mode === "daily") {
+      const seed = getDailySeed();
+      runQuestions = seededShuffle(
+        pool.length > 0 ? pool : allQuestions,
+        seed,
+      ).map(shuffleQuestionOptions);
+    } else {
+      runQuestions = shuffle(pool.length > 0 ? pool : allQuestions).map(
+        shuffleQuestionOptions,
+      );
+    }
+
+    // For marathon, use all questions
+    if (mode === "marathon") {
+      runQuestions = shuffle(allQuestions).map(shuffleQuestionOptions);
+    }
+
+    // For category-lock, use only selected category
+    if (mode === "category-lock" && categories.length === 1) {
+      runQuestions = shuffle(
+        allQuestions.filter((q) => q.category === categories[0]),
+      ).map(shuffleQuestionOptions);
+    }
+
+    // For survival, start with easy questions
+    if (mode === "survival") {
+      const easy = allQuestions.filter((q) => q.difficulty === "easy");
+      const medium = allQuestions.filter((q) => q.difficulty === "medium");
+      const hard = allQuestions.filter((q) => q.difficulty === "hard");
+      runQuestions = shuffle([...easy, ...medium, ...hard]).map(
+        shuffleQuestionOptions,
+      );
+    }
+
+    // For timed mode, get as many as possible
+    if (mode === "timed") {
+      runQuestions = shuffle(pool).map(shuffleQuestionOptions);
+      setTimeLeft(TIMED_MODE_LIMIT);
+    } else {
+      setTimeLeft(DIFFICULTY_TIME_LIMIT[runQuestions[0]?.difficulty || "easy"]);
+    }
+
     setQuizQuestions(runQuestions);
     setCurrentIndex(0);
     setSelectedAnswerIndex(null);
@@ -169,25 +248,99 @@ function App() {
     setStreak(0);
     setBestStreak(0);
     setAnswers([]);
-    setTimeLeft(DIFFICULTY_TIME_LIMIT[runQuestions[0].difficulty]);
+    setAnswerTimes([]);
     setLastRank(null);
+    setGameOver(false);
+    setQuestionStartTime(Date.now());
     setScreen("playing");
   };
 
+  const finishQuiz = () => {
+    // Calculate average time
+    const avgTime =
+      answerTimes.length > 0
+        ? answerTimes.reduce((a, b) => a + b, 0) / answerTimes.length / 1000
+        : 0;
+
+    // Check for comeback kid
+    let comeback = false;
+    if (answers.length > 5) {
+      const firstHalf = answers.slice(0, Math.floor(answers.length / 2));
+      const secondHalf = answers.slice(Math.floor(answers.length / 2));
+      const firstCorrect = firstHalf.filter((a) => a.correct).length;
+      const secondCorrect = secondHalf.filter((a) => a.correct).length;
+      if (firstCorrect < secondCorrect && secondCorrect > firstCorrect * 1.5) {
+        comeback = true;
+      }
+    }
+
+    // Check badges
+    const categoryBreakdown = getCategoryBreakdown();
+    const perfectCategories = categoryBreakdown
+      .filter((c) => c.correct === c.total && c.total >= 3)
+      .map((c) => c.category);
+
+    checkBadges({
+      score,
+      correctCount,
+      totalQuestions: quizQuestions.length,
+      bestStreak,
+      averageTime: avgTime,
+      categoryBreakdown,
+      perfectCategories,
+      comeback,
+    });
+
+    // Update total answered
+    updateTotalAnswered(quizQuestions.length);
+
+    // Save to leaderboard
+    const entry: LeaderboardEntry = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name: playerName,
+      score,
+      correct: correctCount,
+      total: quizQuestions.length,
+      bestStreak,
+      categories:
+        selectedCategories.length === ALL_CATEGORIES.length
+          ? "All"
+          : selectedCategories.join(", "),
+      difficulty: difficultyFilter === "all" ? "All" : difficultyFilter,
+      date: new Date().toISOString(),
+      mode: gameMode,
+      avgTime: avgTime,
+    };
+
+    const updated = [...leaderboard, entry]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, MAX_LEADERBOARD_ENTRIES);
+
+    setLeaderboard(updated);
+    saveLeaderboard(updated);
+    setLastRank(updated.findIndex((e) => e.id === entry.id) + 1);
+    setScreen("finished");
+  };
+
   const handleOptionClick = (optionIndex: number) => {
-    if (selectedAnswerIndex !== null || timedOut || isTransitioning) return;
+    if (selectedAnswerIndex !== null || timedOut || isTransitioning || gameOver)
+      return;
     if (timerRef.current) clearInterval(timerRef.current);
+
+    const timeTaken = Date.now() - questionStartTime;
+    setAnswerTimes((prev) => [...prev, timeTaken]);
     setSelectedAnswerIndex(optionIndex);
 
-  const isCorrect = optionIndex === currentQuestion.correctAnswer;
-  setAnswers((prev) => [
-    ...prev,
-    {
-      question: currentQuestion,
-      selectedIndex: optionIndex,
-      correct: isCorrect,
-    },
-  ]);
+    const isCorrect = optionIndex === currentQuestion.correctAnswer;
+    setAnswers((prev) => [
+      ...prev,
+      {
+        question: currentQuestion,
+        selectedIndex: optionIndex,
+        correct: isCorrect,
+        timeToAnswer: timeTaken,
+      },
+    ]);
 
     if (isCorrect) {
       const basePoints = DIFFICULTY_POINTS[currentQuestion.difficulty];
@@ -204,72 +357,15 @@ function App() {
       setBestStreak((prev) => Math.max(prev, nextStreak));
     } else {
       setStreak(0);
+      // Survival mode: game over on wrong answer
+      if (gameMode === "survival") {
+        setGameOver(true);
+        setTimeout(() => finishQuiz(), 1000);
+      }
     }
   };
 
-  const finishQuiz = () => {
-    const entry: LeaderboardEntry = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      name: playerName,
-      score,
-      correct: correctCount,
-      total: quizQuestions.length,
-      bestStreak,
-      categories:
-        selectedCategories.length === ALL_CATEGORIES.length
-          ? "All"
-          : selectedCategories.join(", "),
-      difficulty: difficultyFilter === "all" ? "All" : difficultyFilter,
-      date: new Date().toISOString(),
-    };
-
-    const updated = [...leaderboard, entry]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, MAX_LEADERBOARD_ENTRIES);
-
-    setLeaderboard(updated);
-    saveLeaderboard(updated);
-    setLastRank(updated.findIndex((e) => e.id === entry.id) + 1);
-    setScreen("finished");
-  };
-
-  const handleNextClick = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-
-    setTimeout(() => {
-      setSelectedAnswerIndex(null);
-      setTimedOut(false);
-
-      if (currentIndex + 1 < quizQuestions.length) {
-        const nextIndex = currentIndex + 1;
-        setCurrentIndex(nextIndex);
-        setTimeLeft(DIFFICULTY_TIME_LIMIT[quizQuestions[nextIndex].difficulty]);
-        setIsTransitioning(false);
-      } else {
-        setIsTransitioning(false);
-        finishQuiz();
-      }
-    }, TRANSITION_MS);
-  };
-
-  const handleRestartSameSetup = () => {
-    startQuiz(selectedCategories, difficultyFilter, playerName);
-  };
-
-  const handleChangeSettings = () => {
-    setScreen("setup");
-  };
-
-  const handleShowReview = () => {
-    setScreen("review");
-  };
-
-  const handleBackToResults = () => {
-    setScreen("finished");
-  };
-
-  const categoryBreakdown = useMemo(() => {
+  const getCategoryBreakdown = () => {
     const byCategory = new Map<Category, { correct: number; total: number }>();
     for (const answer of answers) {
       const category = answer.question.category;
@@ -286,7 +382,46 @@ function App() {
       correct: stats.correct,
       total: stats.total,
     }));
-  }, [answers]);
+  };
+
+  const handleNextClick = () => {
+    if (isTransitioning || gameOver) return;
+    setIsTransitioning(true);
+
+    setTimeout(() => {
+      setSelectedAnswerIndex(null);
+      setTimedOut(false);
+      setQuestionStartTime(Date.now());
+
+      if (currentIndex + 1 < quizQuestions.length) {
+        const nextIndex = currentIndex + 1;
+        setCurrentIndex(nextIndex);
+        setTimeLeft(DIFFICULTY_TIME_LIMIT[quizQuestions[nextIndex].difficulty]);
+        setIsTransitioning(false);
+      } else {
+        setIsTransitioning(false);
+        finishQuiz();
+      }
+    }, TRANSITION_MS);
+  };
+
+  const handleRestartSameSetup = () => {
+    startQuiz(selectedCategories, difficultyFilter, playerName, gameMode);
+  };
+
+  const handleChangeSettings = () => {
+    setScreen("setup");
+  };
+
+  const handleShowReview = () => {
+    setScreen("review");
+  };
+
+  const handleBackToResults = () => {
+    setScreen("finished");
+  };
+
+  const categoryBreakdown = useMemo(() => getCategoryBreakdown(), [answers]);
 
   if (screen === "setup") {
     return (
@@ -296,12 +431,19 @@ function App() {
           questionCounts={questionCounts}
           leaderboard={leaderboard}
           onStart={startQuiz}
+          badgeCount={`${getUnlockedCount()}/${getTotalBadges()}`}
         />
+        <BadgeToast badge={newBadge} onClose={clearNewBadge} />
       </div>
     );
   }
 
   if (screen === "finished") {
+    const avgTime =
+      answerTimes.length > 0
+        ? answerTimes.reduce((a, b) => a + b, 0) / answerTimes.length / 1000
+        : 0;
+
     return (
       <div className="app">
         <ResultCard
@@ -314,10 +456,20 @@ function App() {
           rank={lastRank}
           playerName={playerName}
           categoryBreakdown={categoryBreakdown}
+          gameMode={gameMode}
+          avgTime={avgTime}
           onRestart={handleRestartSameSetup}
           onChangeSettings={handleChangeSettings}
           onReview={handleShowReview}
         />
+        <ShareCard
+          answers={answers}
+          score={correctCount}
+          totalQuestions={quizQuestions.length}
+          playerName={playerName}
+          mode={gameMode}
+        />
+        <BadgeToast badge={newBadge} onClose={clearNewBadge} />
       </div>
     );
   }
@@ -334,6 +486,26 @@ function App() {
 
   const hasAnswered = selectedAnswerIndex !== null || timedOut;
 
+  // Survival mode: game over check
+  if (gameOver) {
+    return (
+      <div className="app">
+        <div className="card result-card">
+          <h1>💀 Game Over!</h1>
+          <p className="score-summary">
+            You survived <strong>{answers.length}</strong> questions!
+          </p>
+          <p className="score-summary">
+            Correct: <strong>{correctCount}</strong>
+          </p>
+          <button className="btn" onClick={finishQuiz}>
+            See Results
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header className="quiz-header">
@@ -348,6 +520,12 @@ function App() {
         <span className="score-strip-item">
           Correct: {correctCount}/{answers.length}
         </span>
+        {gameMode === "timed" && (
+          <span className="score-strip-item">⏱️ {timeLeft}s</span>
+        )}
+        {gameMode === "survival" && (
+          <span className="score-strip-item">💀 Survival Mode</span>
+        )}
       </div>
 
       <span className="category-tag">

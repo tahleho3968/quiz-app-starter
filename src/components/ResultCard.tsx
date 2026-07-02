@@ -1,4 +1,4 @@
-import type { Category } from "../types/quiz";
+import type { Category, GameMode } from "../types/quiz";
 
 interface CategoryBreakdownEntry {
   category: Category;
@@ -16,9 +16,11 @@ interface ResultCardProps {
   rank: number | null;
   playerName: string;
   categoryBreakdown: CategoryBreakdownEntry[];
+  gameMode?: GameMode;
+  avgTime?: number;
   onRestart: () => void;
   onChangeSettings: () => void;
-  onReview: () => void; 
+  onReview: () => void;
 }
 
 const CATEGORY_LABELS: Record<Category, string> = {
@@ -34,6 +36,15 @@ const RANK_TITLES: Record<number, string> = {
   1: "🏆 Quiz Master",
   2: "🥈 Silver Scholar",
   3: "🥉 Bronze Learner",
+};
+
+const GAME_MODE_LABELS: Record<GameMode, string> = {
+  classic: "Classic",
+  timed: "⏱️ Timed",
+  survival: "💀 Survival",
+  marathon: "🏃 Marathon",
+  daily: "📅 Daily Challenge",
+  "category-lock": "🎯 Category Lock",
 };
 
 function getRankTitle(rank: number | null): string {
@@ -53,6 +64,8 @@ export function ResultCard({
   rank,
   playerName,
   categoryBreakdown,
+  gameMode,
+  avgTime,
   onRestart,
   onChangeSettings,
   onReview,
@@ -71,6 +84,12 @@ export function ResultCard({
   return (
     <div className="card result-card">
       <h1>{headline}</h1>
+
+      {/* Game mode badge */}
+      {gameMode && (
+        <div className="game-mode-badge">{GAME_MODE_LABELS[gameMode]}</div>
+      )}
+
       <p className="score-summary">
         You scored <strong>{correctCount}</strong> out of{" "}
         <strong>{totalQuestions}</strong>
@@ -100,6 +119,12 @@ export function ResultCard({
           <div className="stat-box">
             <span className="stat-value">#{rank}</span>
             <span className="stat-label">Rank</span>
+          </div>
+        )}
+        {avgTime !== undefined && avgTime > 0 && (
+          <div className="stat-box">
+            <span className="stat-value">{avgTime.toFixed(1)}s</span>
+            <span className="stat-label">Avg. Time</span>
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@ import type { Question } from "../types/quiz";
 
 const questions: Question[] = [
   // ============================================
-  // GIT CATEGORY (5 Questions)
+  // GIT CATEGORY (8 Questions)
   // ============================================
   {
     id: 1,
@@ -36,18 +36,13 @@ const questions: Question[] = [
   },
   {
     id: 3,
-    question: "What is the purpose of a Pull Request (PR)?",
-    options: [
-      "To delete a branch",
-      "To propose changes and request review before merging",
-      "To clone a repository",
-      "To install dependencies",
-    ],
-    correctAnswer: 1,
+    question: "True or False: `git push` uploads your commits to a remote repository.",
+    options: ["True", "False"],
+    correctAnswer: 0,
     category: "git",
-    difficulty: "medium",
+    difficulty: "easy",
     explanation:
-      "A Pull Request is used to propose changes, get code review, and merge code into the main branch.",
+      "git push uploads your local commits to the remote repository, making them available to others.",
   },
   {
     id: 4,
@@ -79,12 +74,57 @@ const questions: Question[] = [
     explanation:
       "git pull downloads changes from the remote repository and merges them into your current branch.",
   },
-
-  // ============================================
-  // REACT CATEGORY (5 Questions)
-  // ============================================
   {
     id: 6,
+    question: "What is the purpose of a Pull Request (PR)?",
+    options: [
+      "To delete a branch",
+      "To propose changes and request review before merging",
+      "To clone a repository",
+      "To install dependencies",
+    ],
+    correctAnswer: 1,
+    category: "git",
+    difficulty: "medium",
+    explanation:
+      "A Pull Request is used to propose changes, get code review, and merge code into the main branch.",
+  },
+  {
+    id: 7,
+    question: "What does `.gitignore` do?",
+    options: [
+      "Deletes the repository",
+      "Specifies files Git should ignore",
+      "Creates a new branch",
+      "Stages changes",
+    ],
+    correctAnswer: 1,
+    category: "git",
+    difficulty: "medium",
+    explanation:
+      ".gitignore tells Git which files or folders to ignore in a project (like node_modules).",
+  },
+  {
+    id: 8,
+    question: "What is the correct order of Git commands to push a new branch?",
+    options: [
+      "git commit → git add → git push",
+      "git add → git commit → git push",
+      "git push → git add → git commit",
+      "git branch → git commit → git push",
+    ],
+    correctAnswer: 1,
+    category: "git",
+    difficulty: "hard",
+    explanation:
+      "The correct order is: stage files with git add, commit with git commit, then push with git push.",
+  },
+
+  // ============================================
+  // REACT CATEGORY (8 Questions)
+  // ============================================
+  {
+    id: 9,
     question: "What does `useState` do in React?",
     options: [
       "Fetches data from an API",
@@ -99,7 +139,7 @@ const questions: Question[] = [
       "useState is a React Hook that lets you add state to functional components.",
   },
   {
-    id: 7,
+    id: 10,
     question: "What is JSX in React?",
     options: [
       "A database query language",
@@ -114,22 +154,17 @@ const questions: Question[] = [
       "JSX allows you to write HTML-like syntax directly in JavaScript, which React converts to DOM elements.",
   },
   {
-    id: 8,
-    question: "What is a React component?",
-    options: [
-      "A function or class that returns UI elements",
-      "A database table",
-      "A CSS file",
-      "A Git branch",
-    ],
-    correctAnswer: 0,
+    id: 11,
+    question: "True or False: React components must always be class-based.",
+    options: ["True", "False"],
+    correctAnswer: 1,
     category: "react",
     difficulty: "easy",
     explanation:
-      "A React component is a function or class that returns JSX to render UI elements.",
+      "React components can be functional (using hooks) OR class-based. Modern React prefers functional components.",
   },
   {
-    id: 9,
+    id: 12,
     question: "What does `useEffect` do in React?",
     options: [
       "Manages state",
@@ -144,8 +179,8 @@ const questions: Question[] = [
       "useEffect handles side effects such as API calls, timers, or subscriptions that run after render.",
   },
   {
-    id: 10,
-    question: "What is `props` in React?",
+    id: 13,
+    question: "What are `props` in React?",
     options: [
       "Data passed from a parent component to a child",
       "State managed within a component",
@@ -158,12 +193,52 @@ const questions: Question[] = [
     explanation:
       "props (short for properties) are data passed from a parent component to a child component.",
   },
+  {
+    id: 14,
+    question: "What is the difference between state and props?",
+    options: [
+      "State is immutable, props are mutable",
+      "State is managed within a component, props are passed from parent",
+      "They are the same thing",
+      "Props are for data, state is for styling",
+    ],
+    correctAnswer: 1,
+    category: "react",
+    difficulty: "hard",
+    explanation:
+      "State is internal data managed by the component itself, while props are data passed from a parent component.",
+  },
+  {
+    id: 15,
+    question: "What does `{children}` do in React components?",
+    options: [
+      "Renders child components between opening and closing tags",
+      "Creates a new component",
+      "Styles the component",
+      "Fetches data",
+    ],
+    correctAnswer: 0,
+    category: "react",
+    difficulty: "medium",
+    explanation:
+      "The children prop allows you to pass and render nested components between the opening and closing tags.",
+  },
+  {
+    id: 16,
+    question: "True or False: React renders components synchronously.",
+    options: ["True", "False"],
+    correctAnswer: 1,
+    category: "react",
+    difficulty: "medium",
+    explanation:
+      "React uses a virtual DOM and batching to optimize rendering, which can be asynchronous.",
+  },
 
   // ============================================
-  // TYPESCRIPT CATEGORY (5 Questions)
+  // TYPESCRIPT CATEGORY (8 Questions)
   // ============================================
   {
-    id: 11,
+    id: 17,
     question: "What is TypeScript?",
     options: [
       "A JavaScript framework",
@@ -178,31 +253,17 @@ const questions: Question[] = [
       "TypeScript adds static typing to JavaScript, catching type errors during development.",
   },
   {
-    id: 12,
-    question: "What does `type` do in TypeScript?",
-    options: [
-      "Defines a custom type alias",
-      "Creates a new component",
-      "Installs a package",
-      "Runs the application",
-    ],
-    correctAnswer: 0,
-    category: "typescript",
-    difficulty: "medium",
-    explanation:
-      "Type alias allows you to create a new name for a type, making your code more readable.",
-  },
-  {
-    id: 13,
-    question: "What is a `string` type in TypeScript?",
-    options: ["A number", "A boolean", "A textual data type", "An array"],
-    correctAnswer: 2,
+    id: 18,
+    question: "True or False: TypeScript code runs directly in the browser.",
+    options: ["True", "False"],
+    correctAnswer: 1,
     category: "typescript",
     difficulty: "easy",
-    explanation: "The string type represents textual data in TypeScript.",
+    explanation:
+      "TypeScript must be compiled (transpiled) to JavaScript before it can run in the browser.",
   },
   {
-    id: 14,
+    id: 19,
     question: "What does `interface` do in TypeScript?",
     options: [
       "Defines the structure of an object",
@@ -217,20 +278,69 @@ const questions: Question[] = [
       "Interface defines the shape an object should have, specifying property names and types.",
   },
   {
-    id: 15,
-    question: "What is the `boolean` type in TypeScript?",
+    id: 20,
+    question: "What is the difference between `type` and `interface` in TypeScript?",
+    options: [
+      "They are identical",
+      "interface can be extended, type can create unions",
+      "type is for primitives only",
+      "interface is for functions only",
+    ],
+    correctAnswer: 1,
+    category: "typescript",
+    difficulty: "hard",
+    explanation:
+      "Both define types, but interfaces are typically used for object shapes (can be extended), while types can create unions and intersections.",
+  },
+  {
+    id: 21,
+    question: "What does `string` mean in TypeScript?",
+    options: ["A number", "A boolean", "A textual data type", "An array"],
+    correctAnswer: 2,
+    category: "typescript",
+    difficulty: "easy",
+    explanation: "The string type represents textual data in TypeScript.",
+  },
+  {
+    id: 22,
+    question: "What does `boolean` mean in TypeScript?",
     options: ["A number", "A string", "A true or false value", "An object"],
     correctAnswer: 2,
     category: "typescript",
     difficulty: "easy",
     explanation: "The boolean type represents true or false values.",
   },
+  {
+    id: 23,
+    question: "What is the purpose of type annotations in TypeScript?",
+    options: [
+      "To make the code faster",
+      "To specify the expected type of a variable or function",
+      "To add comments",
+      "To format the code",
+    ],
+    correctAnswer: 1,
+    category: "typescript",
+    difficulty: "medium",
+    explanation:
+      "Type annotations tell TypeScript what type a variable, parameter, or return value should be.",
+  },
+  {
+    id: 24,
+    question: "True or False: TypeScript catches errors at compile time.",
+    options: ["True", "False"],
+    correctAnswer: 0,
+    category: "typescript",
+    difficulty: "medium",
+    explanation:
+      "TypeScript checks for type errors during compilation, before the code runs in the browser.",
+  },
 
   // ============================================
-  // TOOLING / DEV TOOLS (5 Questions)
+  // TOOLING CATEGORY (7 Questions)
   // ============================================
   {
-    id: 16,
+    id: 25,
     question: "What does `npm install` do?",
     options: [
       "Uninstalls all packages",
@@ -245,7 +355,7 @@ const questions: Question[] = [
       "npm install downloads and installs all dependencies listed in package.json.",
   },
   {
-    id: 17,
+    id: 26,
     question: "What is Vite used for?",
     options: [
       "A database management tool",
@@ -260,7 +370,17 @@ const questions: Question[] = [
       "Vite is a build tool that provides fast development server and optimized builds.",
   },
   {
-    id: 18,
+    id: 27,
+    question: "True or False: ESLint fixes all errors automatically.",
+    options: ["True", "False"],
+    correctAnswer: 1,
+    category: "tooling",
+    difficulty: "easy",
+    explanation:
+      "ESLint finds errors and can fix some with --fix, but not all errors are automatically fixable.",
+  },
+  {
+    id: 28,
     question: "What does ESLint do?",
     options: [
       "Formats code",
@@ -275,7 +395,7 @@ const questions: Question[] = [
       "ESLint analyzes code to catch syntax errors and enforce consistent coding rules.",
   },
   {
-    id: 19,
+    id: 29,
     question: "What is `package.json` used for?",
     options: [
       "Storing CSS styles",
@@ -290,7 +410,7 @@ const questions: Question[] = [
       "package.json lists dependencies and contains scripts for running, building, and testing the project.",
   },
   {
-    id: 20,
+    id: 30,
     question: "What does `npm run dev` do in this project?",
     options: [
       "Builds the production version",
@@ -304,12 +424,27 @@ const questions: Question[] = [
     explanation:
       "npm run dev starts the Vite development server at localhost:5173.",
   },
+  {
+    id: 31,
+    question: "What is Prettier used for?",
+    options: [
+      "Checking for type errors",
+      "Automatically formatting code",
+      "Running tests",
+      "Managing packages",
+    ],
+    correctAnswer: 1,
+    category: "tooling",
+    difficulty: "medium",
+    explanation:
+      "Prettier automatically formats code to follow consistent style rules.",
+  },
 
   // ============================================
-  // DEPLOYMENT (5 Questions)
+  // DEPLOYMENT CATEGORY (7 Questions)
   // ============================================
   {
-    id: 21,
+    id: 32,
     question: "What is Vercel?",
     options: [
       "A version control system",
@@ -324,10 +459,75 @@ const questions: Question[] = [
       "Vercel is a platform for deploying and hosting frontend applications with built-in CI/CD.",
   },
   {
-    id: 22,
-    question: "What happens when you push to main on a Vercel-connected repo?",
+    id: 33,
+    question: "True or False: Vercel automatically deploys changes when you push to main.",
+    options: ["True", "False"],
+    correctAnswer: 0,
+    category: "deployment",
+    difficulty: "easy",
+    explanation:
+      "Vercel automatically redeploys your application whenever you push changes to the main branch.",
+  },
+  {
+    id: 34,
+    question: "What does CI/CD stand for?",
     options: [
-      "Nothing",
+      "Continuous Integration / Continuous Deployment",
+      "Code Integration / Code Deployment",
+      "Continuous Insertion / Continuous Delivery",
+      "Component Integration / Component Design",
+    ],
+    correctAnswer: 0,
+    category: "deployment",
+    difficulty: "medium",
+    explanation:
+      "CI/CD automates building, testing, and deploying your application whenever code changes are pushed.",
+  },
+  {
+    id: 35,
+    question: "What is the build process in web development?",
+    options: [
+      "Running the development server",
+      "Compiling source code into production-ready files",
+      "Writing new features",
+      "Deleting old code",
+    ],
+    correctAnswer: 1,
+    category: "deployment",
+    difficulty: "medium",
+    explanation:
+      "The build process compiles, bundles, and optimizes source code for production deployment.",
+  },
+  {
+    id: 36,
+    question: "What does `npm run build` do?",
+    options: [
+      "Starts the development server",
+      "Creates an optimized production build",
+      "Runs tests",
+      "Deletes node_modules",
+    ],
+    correctAnswer: 1,
+    category: "deployment",
+    difficulty: "medium",
+    explanation:
+      "npm run build creates a production-ready bundle of your application.",
+  },
+  {
+    id: 37,
+    question: "True or False: You need a credit card to deploy on Vercel.",
+    options: ["True", "False"],
+    correctAnswer: 1,
+    category: "deployment",
+    difficulty: "easy",
+    explanation:
+      "Vercel has a generous free tier - you don't need a credit card to deploy!",
+  },
+  {
+    id: 38,
+    question: "What happens when you push to main with a Vercel-connected repo?",
+    options: [
+      "Nothing happens",
       "It triggers an automatic redeploy",
       "It creates a new branch",
       "It deletes the project",
@@ -338,61 +538,15 @@ const questions: Question[] = [
     explanation:
       "Vercel automatically redeploys your application whenever you push changes to the main branch.",
   },
-  {
-    id: 23,
-    question: "What is CI/CD in the context of Vercel?",
-    options: [
-      "A coding language",
-      "Continuous Integration and Continuous Deployment - auto-building and deploying on push",
-      "A Git command",
-      "A CSS framework",
-    ],
-    correctAnswer: 1,
-    category: "deployment",
-    difficulty: "medium",
-    explanation:
-      "CI/CD automates building, testing, and deploying your application whenever code changes are pushed.",
-  },
-  {
-    id: 24,
-    question:
-      "What critical task happens during the production build pipeline (`npm run build`)?",
-    options: [
-      "The source files are directly uploaded to a physical local database",
-      "The source files are bundled, minified, and compiled down into optimized static assets",
-      "The setup turns off TypeScript types checking configurations completely",
-      "The build config sets up an active testing server on the local host line",
-    ],
-    correctAnswer: 1,
-    category: "deployment",
-    difficulty: "hard",
-    explanation:
-      "The production build gathers, bundles, transpiles, and minifies files into lightweight, standalone static assets optimal for fast delivery from a server.",
-  },
-  {
-    id: 25,
-    question: "What does a `404 Not Found` HTTP status code represent?",
-    options: [
-      "The server received an unauthorized administration authentication login request",
-      "The server itself went down completely due to internal processing runtime errors",
-      "The requested URL route or asset pathway could not be located on the hosting platform",
-      "The data transfer pipeline completed the download transaction process normally",
-    ],
-    correctAnswer: 2,
-    category: "deployment",
-    difficulty: "hard",
-    explanation:
-      "An HTTP 404 response explicitly states that the host successfully communicated with the client browser, but the targeted URL path does not exist on that server.",
-  },
 
   // ============================================
-  // HTML / CSS (5 Questions)
+  // HTML/CSS CATEGORY (7 Questions)
   // ============================================
   {
-    id: 26,
+    id: 39,
     question: "What does `flexbox` do in CSS?",
     options: [
-      "Creates a flexbox layout",
+      "Creates a flexbox layout for responsive design",
       "Creates a grid layout",
       "Creates a new component",
       "Deploys the app",
@@ -404,7 +558,7 @@ const questions: Question[] = [
       "Flexbox is a CSS layout model that distributes space and aligns items in a container.",
   },
   {
-    id: 27,
+    id: 40,
     question: "What is the purpose of responsive design?",
     options: [
       "To make the app look good on different screen sizes",
@@ -419,36 +573,214 @@ const questions: Question[] = [
       "Responsive design ensures that websites work well on different devices and screen sizes.",
   },
   {
-    id: 28,
-    question:
-      "Which HTML5 element is used to display standalone self-contained content like illustrations or photos?",
-    options: ["<aside>", "<section>", "<figure>", "<details>"],
-    correctAnswer: 2,
-    category: "html-css",
-    difficulty: "medium",
-    explanation:
-      "<figure> is a semantic element designed to encapsulate self-contained media content, often paired with <figcaption>.",
-  },
-  {
-    id: 29,
-    question: "What is the default value of the `position` property in CSS?",
-    options: ["relative", "static", "absolute", "fixed"],
-    correctAnswer: 1,
-    category: "html-css",
-    difficulty: "medium",
-    explanation:
-      "Elements are positioned 'static' by default, meaning they follow the normal document flow and are unaffected by top, bottom, left, or right properties.",
-  },
-  {
-    id: 30,
-    question:
-      "In CSS Box Model, which property adds space inside an element between its content and its border?",
-    options: ["margin", "padding", "border-width", "outline"],
+    id: 41,
+    question: "True or False: CSS Grid is only for complex layouts.",
+    options: ["True", "False"],
     correctAnswer: 1,
     category: "html-css",
     difficulty: "easy",
     explanation:
-      "Padding adds transparent space inside an element's border, whereas margin adds space outside the border boundaries.",
+      "CSS Grid can be used for both simple and complex layouts - it's powerful and flexible.",
+  },
+  {
+    id: 42,
+    question: "What does `margin` do in CSS?",
+    options: [
+      "Adds space inside an element",
+      "Adds space outside an element",
+      "Changes the color",
+      "Adds a border",
+    ],
+    correctAnswer: 1,
+    category: "html-css",
+    difficulty: "easy",
+    explanation:
+      "Margin adds space outside an element's border, creating space between elements.",
+  },
+  {
+    id: 43,
+    question: "What does `padding` do in CSS?",
+    options: [
+      "Adds space inside an element between content and border",
+      "Adds space outside an element",
+      "Changes the font size",
+      "Adds a shadow",
+    ],
+    correctAnswer: 0,
+    category: "html-css",
+    difficulty: "easy",
+    explanation:
+      "Padding adds space inside an element between the content and the border.",
+  },
+  {
+    id: 44,
+    question: "What is the difference between `div` and `span` in HTML?",
+    options: [
+      "They are the same",
+      "div is block-level, span is inline",
+      "div is inline, span is block-level",
+      "span is for headings",
+    ],
+    correctAnswer: 1,
+    category: "html-css",
+    difficulty: "medium",
+    explanation:
+      "div is a block-level element (takes full width), while span is inline (takes only as much width as needed).",
+  },
+  {
+    id: 45,
+    question: "True or False: CSS variables can be used in media queries.",
+    options: ["True", "False"],
+    correctAnswer: 0,
+    category: "html-css",
+    difficulty: "hard",
+    explanation:
+      "CSS variables (custom properties) can be used in media queries, making responsive design more flexible.",
+  },
+
+  // ============================================
+  // 🆕 ADDITIONAL QUESTION TYPES (Questions 46-55)
+  // ============================================
+
+  {
+    id: 46,
+    question: "Complete the Git command: `git ___` creates a new branch and switches to it.",
+    options: [
+      "checkout -b",
+      "branch",
+      "clone",
+      "init -b",
+    ],
+    correctAnswer: 0,
+    category: "git",
+    difficulty: "medium",
+    explanation: "git checkout -b creates a new branch and switches to it in one command.",
+  },
+  {
+    id: 47,
+    question: "Complete the command: `___ install` downloads all project dependencies.",
+    options: [
+      "npm",
+      "git",
+      "node",
+      "vite",
+    ],
+    correctAnswer: 0,
+    category: "tooling",
+    difficulty: "easy",
+    explanation: "npm install downloads all dependencies listed in package.json.",
+  },
+  {
+    id: 48,
+    question: "What does this React code do?\n\nconst [count, setCount] = useState(0);",
+    options: [
+      "Creates a state variable called count with initial value 0",
+      "Creates a function called count",
+      "Creates a CSS class",
+      "Imports a component",
+    ],
+    correctAnswer: 0,
+    category: "react",
+    difficulty: "medium",
+    explanation: "useState(0) creates a state variable 'count' initialized to 0 and a setter function 'setCount'.",
+  },
+  {
+    id: 49,
+    question: "What will this TypeScript code output?\n\nconst name: string = 'ACA';\nconsole.log(name);",
+    options: [
+      "ACA",
+      "undefined",
+      "null",
+      "Error",
+    ],
+    correctAnswer: 0,
+    category: "typescript",
+    difficulty: "medium",
+    explanation: "The code declares a string variable 'name' with value 'ACA' and logs it to the console.",
+  },
+  {
+    id: 50,
+    question: "Match the Git command to its description:",
+    options: [
+      "git clone → Downloads a repository",
+      "git push → Uploads commits",
+      "git pull → Downloads and merges",
+      "All of the above are correct",
+    ],
+    correctAnswer: 3,
+    category: "git",
+    difficulty: "hard",
+    explanation: "All three commands are correctly matched to their descriptions.",
+  },
+  {
+    id: 51,
+    question: "Match the React Hook to its purpose:",
+    options: [
+      "useState → Manages state",
+      "useEffect → Handles side effects",
+      "useContext → Shares data across components",
+      "All of the above are correct",
+    ],
+    correctAnswer: 3,
+    category: "react",
+    difficulty: "hard",
+    explanation: "All three Hooks are correctly matched to their purposes.",
+  },
+  {
+    id: 52,
+    question: "What is the correct order of Git commands to push a new feature?",
+    options: [
+      "1. git add → 2. git commit → 3. git push",
+      "1. git commit → 2. git add → 3. git push",
+      "1. git push → 2. git add → 3. git commit",
+      "1. git branch → 2. git commit → 3. git push",
+    ],
+    correctAnswer: 0,
+    category: "git",
+    difficulty: "hard",
+    explanation: "The correct order is: stage files (git add), commit (git commit), then push (git push).",
+  },
+  {
+    id: 53,
+    question: "What is the correct order of steps in a React component lifecycle?",
+    options: [
+      "1. Mount → 2. Update → 3. Unmount",
+      "1. Update → 2. Mount → 3. Unmount",
+      "1. Unmount → 2. Mount → 3. Update",
+      "1. Mount → 2. Unmount → 3. Update",
+    ],
+    correctAnswer: 0,
+    category: "react",
+    difficulty: "hard",
+    explanation: "The React component lifecycle goes: Mount (render), Update (re-render), Unmount (remove).",
+  },
+  {
+    id: 54,
+    question: "What does this Git command do?\n\ngit log --oneline",
+    options: [
+      "Shows the commit history in a compact format",
+      "Deletes the repository",
+      "Creates a new branch",
+      "Stages changes",
+    ],
+    correctAnswer: 0,
+    category: "git",
+    difficulty: "medium",
+    explanation: "git log --oneline shows the commit history with each commit on one line.",
+  },
+  {
+    id: 55,
+    question: "What will this CSS code do?\n\ndisplay: flex;\njustify-content: center;",
+    options: [
+      "Centers items horizontally in a flex container",
+      "Centers items vertically in a flex container",
+      "Creates a grid layout",
+      "Hides the element",
+    ],
+    correctAnswer: 0,
+    category: "html-css",
+    difficulty: "medium",
+    explanation: "display: flex creates a flex container, and justify-content: center centers items horizontally.",
   },
 ];
 
