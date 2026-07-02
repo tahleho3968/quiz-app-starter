@@ -309,7 +309,6 @@ function App() {
       <span className="category-tag">
         {currentQuestion.category.toUpperCase()}
       </span>
-
       <QuestionCard
         key={currentIndex}
         currentQuestion={currentQuestion}
