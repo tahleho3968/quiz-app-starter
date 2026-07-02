@@ -32,6 +32,7 @@ export function SetupScreen({
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
   const [playerName, setPlayerName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const toggleCategory = (category: Category) => {
@@ -46,7 +47,20 @@ export function SetupScreen({
     selectedCategories.length === 0 ? categories : selectedCategories;
 
   const handleStart = () => {
-    onStart(effectiveCategories, difficulty, playerName.trim() || "Player");
+    const trimmedName = playerName.trim();
+
+    if (!trimmedName) {
+      setNameError("Please enter your name.");
+      return;
+    }
+
+    if (!/[A-Za-z]/.test(trimmedName)) {
+      setNameError("Your name must contain letters.");
+      return;
+    }
+
+    setNameError(null);
+    onStart(effectiveCategories, difficulty, trimmedName);
   };
 
   const topScores = [...leaderboard]
@@ -65,15 +79,25 @@ export function SetupScreen({
         <label className="setup-label" htmlFor="player-name">
           Your name
         </label>
-        <input
-          id="player-name"
-          className="setup-input"
-          type="text"
-          placeholder="Enter your name"
-          maxLength={24}
-          value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-        />
+        <div className="input-with-overlay">
+          <input
+            id="player-name"
+            className={`setup-input ${nameError ? "setup-input-error" : ""}`}
+            type="text"
+            placeholder="Enter your name"
+            maxLength={24}
+            value={playerName}
+            onChange={(e) => {
+              setPlayerName(e.target.value);
+              if (nameError) setNameError(null);
+            }}
+          />
+          {nameError && (
+            <div className="input-error-overlay" role="alert">
+              {nameError}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="setup-section">
