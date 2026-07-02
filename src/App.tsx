@@ -340,6 +340,8 @@ function App() {
         timeLimit={timeLimit}
         streak={streak}
         timedOut={timedOut}
+        currentQuestionIndex={currentIndex}
+        totalQuestions={quizQuestions.length}
       />
 
       {hasAnswered && !isTransitioning && (
