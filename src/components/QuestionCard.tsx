@@ -9,6 +9,8 @@ interface QuestionCardProps {
   timeLimit: number;
   streak: number;
   timedOut: boolean;
+  currentQuestionIndex: number;
+  totalQuestions: number;
 }
 
 export function QuestionCard({
@@ -20,6 +22,8 @@ export function QuestionCard({
   timeLimit,
   streak,
   timedOut,
+  currentQuestionIndex,
+  totalQuestions,
 }: QuestionCardProps) {
   const hasAnswered = selectedAnswerIndex !== null || timedOut;
   const isCorrectChoice = selectedAnswerIndex === currentQuestion.correctAnswer;
@@ -56,6 +60,13 @@ export function QuestionCard({
   const timePercent = Math.max(0, Math.min(100, (timeLeft / timeLimit) * 100));
   const timerUrgent = timeLeft <= Math.ceil(timeLimit * 0.25) && !hasAnswered;
 
+  // Absolute completion percentage — counts the question currently on screen
+  // as "in progress" toward the total, reaching 100% on the final question.
+  const progressPercent =
+    totalQuestions > 0
+      ? Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100)
+      : 0;
+
   return (
     <div className={cardClassName}>
       <div className="card-meta-row">
@@ -77,6 +88,17 @@ export function QuestionCard({
       </div>
       <div className="timer-label">
         {hasAnswered ? "Time's up" : `${timeLeft}s left`}
+      </div>
+
+      {/* Overall quiz progress tracker */}
+      <div className="progress-bar-wrap">
+        <div className="progress-bar-track">
+          <div
+            className="progress-bar-fill"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+        <div className="progress-bar-label">{progressPercent}% Complete</div>
       </div>
 
       <h2>{currentQuestion.question}</h2>

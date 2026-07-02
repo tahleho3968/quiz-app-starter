@@ -29,6 +29,17 @@ function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
+/**
+ * Returns a copy of the question with its options shuffled and
+ * `correctAnswer` remapped to point at the new position of the right option.
+ */
+function shuffleQuestionOptions(question: Question): Question {
+  const indices = shuffle(question.options.map((_, i) => i));
+  const options = indices.map((i) => question.options[i]);
+  const correctAnswer = indices.indexOf(question.correctAnswer);
+  return { ...question, options, correctAnswer };
+}
+
 function loadLeaderboard(): LeaderboardEntry[] {
   try {
     const raw = localStorage.getItem(LEADERBOARD_KEY);
@@ -139,7 +150,7 @@ function App() {
         categories.includes(q.category) &&
         (difficulty === "all" || q.difficulty === difficulty),
     );
-    const runQuestions = shuffle(pool.length > 0 ? pool : allQuestions);
+    const runQuestions = shuffle(pool.length > 0 ? pool : allQuestions).map(shuffleQuestionOptions,);
 
     setPlayerName(name);
     setSelectedCategories(categories);
