@@ -19,6 +19,7 @@ import type {
 import "./App.css";
 
 const LEADERBOARD_KEY = "aca_quiz_leaderboard";
+const SESSION_KEY = "aca_quiz_session";
 const TRANSITION_MS = 1200;
 const MAX_LEADERBOARD_ENTRIES = 50;
 const TIMED_MODE_LIMIT = 300; // 5 minutes
@@ -63,6 +64,64 @@ interface AnswerRecord {
   selectedIndex: number | null;
   correct: boolean;
   timeToAnswer?: number;
+}
+
+// Everything needed to fully resume a quiz after a page refresh or a
+// closed/reopened tab. Deliberately excludes `isTransitioning` and
+// `questionStartTime` and `autoFinishPending` — those are short-lived
+// animation/internal-timing flags that should always reset to a clean
+// state on load rather than resume mid-transition.
+interface SessionSnapshot {
+  screen: Screen;
+  gameMode: GameMode;
+  playerName: string;
+  selectedCategories: Category[];
+  difficultyFilter: Difficulty | "all";
+  quizQuestions: Question[];
+  currentIndex: number;
+  selectedAnswerIndex: number | null;
+  timedOut: boolean;
+  score: number;
+  timeBonusTotal: number;
+  streakBonusTotal: number;
+  correctCount: number;
+  streak: number;
+  bestStreak: number;
+  answers: AnswerRecord[];
+  timeLeft: number;
+  sessionTimeLeft: number;
+  gameOver: boolean;
+  answerTimes: number[];
+  lastRank: number | null;
+}
+
+function loadSession(): SessionSnapshot | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as SessionSnapshot;
+    // Only worth restoring if there's an actual run in progress (or just
+    // finished) with real questions loaded — anything else, start fresh.
+    if (!parsed.quizQuestions || parsed.quizQuestions.length === 0) return null;
+    if (parsed.screen === "setup") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveSession(snapshot: SessionSnapshot) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(snapshot));
+  } catch {
+    // localStorage can throw if it's full or unavailable (e.g. private
+    // browsing in some browsers) — not fatal, progress just won't survive
+    // a refresh in that specific case.
+  }
+}
+
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
 }
 
 function App() {
@@ -114,6 +173,7 @@ function App() {
   const [answerTimes, setAnswerTimes] = useState<number[]>([]);
   const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
   const [autoFinishPending, setAutoFinishPending] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const sessionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -133,11 +193,121 @@ function App() {
     return counts;
   }, []);
 
+  // --- Restore session on mount ---
+  useEffect(() => {
+    const saved = loadSession();
+    if (saved) {
+      setIsRestoring(true);
+      // Restore all state from session
+      setScreen(saved.screen);
+      setGameMode(saved.gameMode);
+      setPlayerName(saved.playerName);
+      setSelectedCategories(saved.selectedCategories);
+      setDifficultyFilter(saved.difficultyFilter);
+      setQuizQuestions(saved.quizQuestions);
+      setCurrentIndex(saved.currentIndex);
+      setSelectedAnswerIndex(saved.selectedAnswerIndex);
+      setTimedOut(saved.timedOut);
+      setScore(saved.score);
+      setTimeBonusTotal(saved.timeBonusTotal);
+      setStreakBonusTotal(saved.streakBonusTotal);
+      setCorrectCount(saved.correctCount);
+      setStreak(saved.streak);
+      setBestStreak(saved.bestStreak);
+      setAnswers(saved.answers);
+      setTimeLeft(saved.timeLeft);
+      setSessionTimeLeft(saved.sessionTimeLeft);
+      setGameOver(saved.gameOver);
+      setAnswerTimes(saved.answerTimes);
+      setLastRank(saved.lastRank);
+      // Reset transient flags
+      setIsTransitioning(false);
+      setQuestionStartTime(Date.now());
+      setAutoFinishPending(false);
+      setIsRestoring(false);
+    }
+  }, []);
+
+  // --- Save session whenever state changes ---
+  useEffect(() => {
+    // Don't save while restoring or on setup screen
+    if (isRestoring) return;
+    if (screen === "setup") {
+      clearSession();
+      return;
+    }
+
+    const snapshot: SessionSnapshot = {
+      screen,
+      gameMode,
+      playerName,
+      selectedCategories,
+      difficultyFilter,
+      quizQuestions,
+      currentIndex,
+      selectedAnswerIndex,
+      timedOut,
+      score,
+      timeBonusTotal,
+      streakBonusTotal,
+      correctCount,
+      streak,
+      bestStreak,
+      answers,
+      timeLeft,
+      sessionTimeLeft,
+      gameOver,
+      answerTimes,
+      lastRank,
+    };
+
+    saveSession(snapshot);
+  }, [
+    screen,
+    gameMode,
+    playerName,
+    selectedCategories,
+    difficultyFilter,
+    quizQuestions,
+    currentIndex,
+    selectedAnswerIndex,
+    timedOut,
+    score,
+    timeBonusTotal,
+    streakBonusTotal,
+    correctCount,
+    streak,
+    bestStreak,
+    answers,
+    timeLeft,
+    sessionTimeLeft,
+    gameOver,
+    answerTimes,
+    lastRank,
+    isRestoring,
+  ]);
+
+  // --- Tab close / refresh warning ---
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Only show warning if a quiz is in progress (not finished, not setup)
+      if (screen === "playing" && quizQuestions.length > 0) {
+        // Standard way to show browser's native confirmation dialog
+        e.preventDefault();
+        e.returnValue =
+          "⚠️ You have a quiz in progress! If you leave now, your progress will be saved but the timer will continue running. Are you sure you want to leave?";
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [screen, quizQuestions.length]);
+
   // --- Session timer for Timed mode ---
   useEffect(() => {
     if (screen !== "playing" || gameMode !== "timed") return;
     if (sessionTimeLeft <= 0) {
-      // Time's up! Finish the quiz
       finishQuiz();
       return;
     }
@@ -195,21 +365,13 @@ function App() {
     ]);
     setAnswerTimes((prev) => [...prev, timeTaken]);
 
-    // Survival mode: game over on timeout.
-    // We don't call finishQuiz() directly here — at this point in the effect,
-    // React hasn't yet re-rendered with the answer we just pushed above, so
-    // finishQuiz would run with a stale `answers` array missing this last
-    // attempt. Instead we flip a flag and let a dedicated effect (below)
-    // handle the delayed call once the render has caught up.
     if (gameMode === "survival") {
       setGameOver(true);
       setAutoFinishPending(true);
     }
   }, [timedOut]);
 
-  // Handles the delayed auto-finish for Survival mode timeouts. Runs on the
-  // render *after* the final answer has been committed to state, so
-  // finishQuiz() below always sees the complete `answers` array.
+  // Handles the delayed auto-finish for Survival mode timeouts
   useEffect(() => {
     if (!autoFinishPending) return;
 
@@ -228,6 +390,9 @@ function App() {
     name: string,
     mode: GameMode = "classic",
   ) => {
+    // Clear any old session
+    clearSession();
+
     setGameMode(mode);
     setPlayerName(name);
     setSelectedCategories(categories);
@@ -244,9 +409,6 @@ function App() {
 
     switch (mode) {
       case "daily": {
-        // Everyone gets the exact same question set today, regardless of
-        // whatever category/difficulty filters they had selected — that's
-        // what makes Share Card results actually comparable between players.
         const seed = getDailySeed();
         runQuestions = seededShuffle(allQuestions, seed).map(
           shuffleQuestionOptions,
@@ -257,8 +419,6 @@ function App() {
         runQuestions = shuffle(allQuestions).map(shuffleQuestionOptions);
         break;
       case "category-lock":
-        // SetupScreen guarantees exactly one category is selected before
-        // this mode can be started.
         runQuestions = shuffle(
           allQuestions.filter((q) => q.category === categories[0]),
         ).map(shuffleQuestionOptions);
@@ -277,8 +437,6 @@ function App() {
         break;
       case "classic":
       default:
-        // Classic mode advertises "20 questions" in the mode picker —
-        // cap it here so the label and the actual run always match.
         runQuestions = shuffle(safePool)
           .slice(0, 20)
           .map(shuffleQuestionOptions);
@@ -307,13 +465,14 @@ function App() {
   };
 
   const finishQuiz = () => {
-    // Calculate average time
+    // Clear session when quiz is finished
+    clearSession();
+
     const avgTime =
       answerTimes.length > 0
         ? answerTimes.reduce((a, b) => a + b, 0) / answerTimes.length / 1000
         : 0;
 
-    // Check for comeback kid
     let comeback = false;
     if (answers.length > 5) {
       const firstHalf = answers.slice(0, Math.floor(answers.length / 2));
@@ -325,7 +484,6 @@ function App() {
       }
     }
 
-    // Check badges
     const categoryBreakdown = getCategoryBreakdown();
     const perfectCategories = categoryBreakdown
       .filter((c) => c.correct === c.total && c.total >= 3)
@@ -342,14 +500,11 @@ function App() {
       comeback,
     });
 
-    // Update total answered
     updateTotalAnswered(quizQuestions.length);
 
-    // For Survival mode, use actual attempted questions count
     const totalAttempted =
       gameMode === "survival" ? answers.length : quizQuestions.length;
 
-    // Save to leaderboard
     const entry: LeaderboardEntry = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       name: playerName,
@@ -412,10 +567,8 @@ function App() {
       setBestStreak((prev) => Math.max(prev, nextStreak));
     } else {
       setStreak(0);
-      // Survival mode: game over on wrong answer
       if (gameMode === "survival") {
         setGameOver(true);
-        // Don't call finishQuiz here - let the user click "See Results"
       }
     }
   };
@@ -451,13 +604,11 @@ function App() {
       if (currentIndex + 1 < quizQuestions.length) {
         const nextIndex = currentIndex + 1;
         setCurrentIndex(nextIndex);
-        // Only reset timeLeft for non-timed modes
         if (gameMode !== "timed") {
           setTimeLeft(
             DIFFICULTY_TIME_LIMIT[quizQuestions[nextIndex].difficulty],
           );
         } else {
-          // For timed mode, keep the session timer running
           setTimeLeft(DIFFICULTY_TIME_LIMIT[quizQuestions[nextIndex].difficulty]);
         }
         setIsTransitioning(false);
@@ -473,6 +624,7 @@ function App() {
   };
 
   const handleChangeSettings = () => {
+    clearSession();
     setScreen("setup");
   };
 
@@ -549,7 +701,6 @@ function App() {
 
   const hasAnswered = selectedAnswerIndex !== null || timedOut;
 
-  // Survival mode: game over check
   if (gameOver) {
     return (
       <div className="app">
